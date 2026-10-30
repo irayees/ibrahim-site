@@ -51,7 +51,7 @@
             border-radius: 8px;
             font-size: 0.95rem;
         }
-        button {
+        .unlock-btn {
             background: #111827;
             color: #fff;
             border: none;
@@ -60,7 +60,7 @@
             font-weight: 600;
             cursor: pointer;
         }
-        button:hover { background: #374151; }
+        .unlock-btn:hover { background: #374151; }
         #error-msg {
             color: #dc2626;
             font-size: 0.85rem;
@@ -85,12 +85,83 @@
             overflow: hidden;
             background: #e5e7eb;
             aspect-ratio: 4 / 3;
+            cursor: pointer;
         }
         .photo-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
+            transition: transform 0.25s ease;
+        }
+        .photo-item:hover img {
+            transform: scale(1.03);
+        }
+
+        /* Lightbox Overlay */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+        #lightbox.active {
+            display: flex;
+        }
+        #lightbox-img {
+            max-width: 85vw;
+            max-height: 85vh;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            object-fit: contain;
+        }
+        .lb-btn {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.14);
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+        .lb-btn:hover {
+            background: rgba(255, 255, 255, 0.28);
+            transform: scale(1.06);
+        }
+        #lb-close {
+            top: 24px;
+            right: 24px;
+        }
+        #lb-prev {
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        #lb-prev:hover { transform: translateY(-50%) scale(1.06); }
+        #lb-next {
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        #lb-next:hover { transform: translateY(-50%) scale(1.06); }
+
+        @media (max-width: 600px) {
+            #lightbox-img { max-width: 94vw; max-height: 80vh; }
+            .lb-btn { width: 40px; height: 40px; font-size: 1.1rem; }
+            #lb-prev { left: 10px; }
+            #lb-next { right: 10px; }
+            #lb-close { top: 16px; right: 16px; }
         }
     </style>
 </head>
@@ -109,19 +180,29 @@
         <p>Please enter the event password to view these photos.</p>
         <form class="input-group" onsubmit="checkPassword(event)">
             <input type="password" id="pw-input" placeholder="Enter password..." required>
-            <button type="submit">Unlock</button>
+            <button type="submit" class="unlock-btn">Unlock</button>
         </form>
         <div id="error-msg">Incorrect password. Please try again.</div>
     </div>
 
-    <!-- Gallery container (populated only after password match) -->
+    <!-- Gallery container -->
     <main id="gallery-grid"></main>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" onclick="handleBackdropClick(event)">
+        <button id="lb-close" class="lb-btn" onclick="closeLightbox()" aria-label="Close">✕</button>
+        <button id="lb-prev" class="lb-btn" onclick="changePhoto(-1)" aria-label="Previous photo">❮</button>
+        <img id="lightbox-img" src="" alt="Enlarged event photo">
+        <button id="lb-next" class="lb-btn" onclick="changePhoto(1)" aria-label="Next photo">❯</button>
+    </div>
 
     <script>
         // ==========================================
+        // CUSTOMIZE PASSWORD AND PHOTO LIST HERE:
+        // ("jphill" for eCoH, "sequoia" for Chawanakee, "msa2025" for Iftar)
+        // ==========================================
         const ALBUM_PASSWORD = "jphill"; 
         
-        // List the photos you uploaded into this album's images/ folder:
         const PHOTOS = [
             "images/photo1.jpg",
             "images/photo2.jpg",
@@ -130,16 +211,19 @@
         // ==========================================
 
         const storageKey = "unlocked_" + window.location.pathname;
+        let currentIndex = 0;
 
         function unlockGallery() {
             document.getElementById("lock-screen").style.display = "none";
             const grid = document.getElementById("gallery-grid");
             grid.style.display = "grid";
             grid.innerHTML = "";
-            PHOTOS.forEach(src => {
+
+            PHOTOS.forEach((src, index) => {
                 const div = document.createElement("div");
                 div.className = "photo-item";
-                div.innerHTML = `<a href="${src}" target="_blank"><img src="${src}" loading="lazy" alt="Event photo"></a>`;
+                div.onclick = () => openLightbox(index);
+                div.innerHTML = `<img src="${src}" loading="lazy" alt="Photo ${index + 1}">`;
                 grid.appendChild(div);
             });
         }
@@ -155,7 +239,43 @@
             }
         }
 
-        // Keep unlocked if user refreshes the page during their visit
+        // Lightbox Controls
+        function openLightbox(index) {
+            currentIndex = index;
+            document.getElementById("lightbox-img").src = PHOTOS[currentIndex];
+            document.getElementById("lightbox").classList.add("active");
+            document.body.style.overflow = "hidden"; // Prevent background scrolling
+        }
+
+        function closeLightbox() {
+            document.getElementById("lightbox").classList.remove("active");
+            document.getElementById("lightbox-img").src = "";
+            document.body.style.overflow = "";
+        }
+
+        function changePhoto(direction) {
+            currentIndex = (currentIndex + direction + PHOTOS.length) % PHOTOS.length;
+            document.getElementById("lightbox-img").src = PHOTOS[currentIndex];
+        }
+
+        function handleBackdropClick(e) {
+            // Close if clicking the darkened background (not the image or buttons)
+            if (e.target.id === "lightbox") {
+                closeLightbox();
+            }
+        }
+
+        // Keyboard Arrow & Escape Navigation
+        document.addEventListener("keydown", (e) => {
+            const lb = document.getElementById("lightbox");
+            if (!lb.classList.contains("active")) return;
+
+            if (e.key === "ArrowRight") changePhoto(1);
+            if (e.key === "ArrowLeft") changePhoto(-1);
+            if (e.key === "Escape") closeLightbox();
+        });
+
+        // Keep unlocked during session
         if (sessionStorage.getItem(storageKey) === "true") {
             unlockGallery();
         }
