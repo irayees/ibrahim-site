@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locked Album | Ibrahim Rayees</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: #fafafa;
+            color: #111827;
+        }
+        header {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 1.5rem;
+        }
+        .back-link {
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .back-link:hover { color: #111827; }
+        h1 { margin: 0.5rem 0 0.2rem 0; font-size: 2rem; }
+        .date { color: #6b7280; margin: 0; font-size: 0.95rem; }
+
+        /* Lock Screen Box */
+        #lock-screen {
+            max-width: 400px;
+            margin: 4rem auto;
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        #lock-screen h2 { margin: 0 0 0.5rem 0; font-size: 1.25rem; }
+        #lock-screen p { color: #6b7280; font-size: 0.9rem; margin: 0 0 1.5rem 0; }
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        input[type="password"] {
+            flex: 1;
+            padding: 0.65rem 0.85rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        button {
+            background: #111827;
+            color: #fff;
+            border: none;
+            padding: 0.65rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover { background: #374151; }
+        #error-msg {
+            color: #dc2626;
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+            display: none;
+        }
+
+        /* Photo Grid (Hidden until unlocked) */
+        #gallery-grid {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem 4rem;
+        }
+        @media (max-width: 900px) { #gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 580px) { #gallery-grid { grid-template-columns: 1fr; } }
+
+        .photo-item {
+            border-radius: 8px;
+            overflow: hidden;
+            background: #e5e7eb;
+            aspect-ratio: 4 / 3;
+        }
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/photos/" class="back-link">← Back to All Albums</a>
+        <!-- CHANGE EVENT TITLE & DATE BELOW FOR EACH ALBUM -->
+        <h1>eCoH Aug 2026</h1>
+        <p class="date">August 23, 2026</p>
+    </header>
+
+    <!-- Password Prompt -->
+    <div id="lock-screen">
+        <h2>🔒 Private Album</h2>
+        <p>Please enter the event password to view these photos.</p>
+        <form class="input-group" onsubmit="checkPassword(event)">
+            <input type="password" id="pw-input" placeholder="Enter password..." required>
+            <button type="submit">Unlock</button>
+        </form>
+        <div id="error-msg">Incorrect password. Please try again.</div>
+    </div>
+
+    <!-- Gallery container (populated only after password match) -->
+    <main id="gallery-grid"></main>
+
+    <script>
+        // ==========================================
+        const ALBUM_PASSWORD = "sequoia"; 
+        
+        // List the photos you uploaded into this album's images/ folder:
+        const PHOTOS = [
+            "images/photo1.jpg",
+            "images/photo2.jpg",
+            "images/photo3.jpg"
+        ];
+        // ==========================================
+
+        const storageKey = "unlocked_" + window.location.pathname;
+
+        function unlockGallery() {
+            document.getElementById("lock-screen").style.display = "none";
+            const grid = document.getElementById("gallery-grid");
+            grid.style.display = "grid";
+            grid.innerHTML = "";
+            PHOTOS.forEach(src => {
+                const div = document.createElement("div");
+                div.className = "photo-item";
+                div.innerHTML = `<a href="${src}" target="_blank"><img src="${src}" loading="lazy" alt="Event photo"></a>`;
+                grid.appendChild(div);
+            });
+        }
+
+        function checkPassword(e) {
+            e.preventDefault();
+            const input = document.getElementById("pw-input").value.trim();
+            if (input === ALBUM_PASSWORD) {
+                sessionStorage.setItem(storageKey, "true");
+                unlockGallery();
+            } else {
+                document.getElementById("error-msg").style.display = "block";
+            }
+        }
+
+        // Keep unlocked if user refreshes the page during their visit
+        if (sessionStorage.getItem(storageKey) === "true") {
+            unlockGallery();
+        }
+    </script>
+
+</body>
+</html>
