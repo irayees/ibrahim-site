@@ -3,54 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photography | Ibrahim Rayees</title>
+    <title>Photo Albums | Ibrahim Rayees</title>
     <style>
+        * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
+            background-color: #fafafa;
+            color: #111827;
         }
         header {
-            text-align: center;
-            padding: 3rem 1rem;
-        }
-        header h1 {
-            margin: 0 0 0.5rem 0;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 1.5rem;
         }
         .back-link {
-            color: #555;
+            color: #6b7280;
             text-decoration: none;
             font-size: 0.9rem;
+            font-weight: 500;
         }
-        .back-link:hover {
-            text-decoration: underline;
+        .back-link:hover { color: #111827; }
+        header h1 {
+            font-size: 2.25rem;
+            margin: 0.5rem 0 0.25rem 0;
+            letter-spacing: -0.02em;
         }
-        /* Responsive Grid System */
-        .gallery-container {
+        header p {
+            color: #6b7280;
+            margin: 0;
+        }
+
+        /* 3 Columns on Desktop, adapts to smaller screens */
+        .albums-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            padding: 2rem;
-            max-width: 1200px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1100px;
             margin: 0 auto;
+            padding: 1.5rem 1.5rem 4rem;
         }
-        .photo-card {
-            overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            background: #fff;
+        @media (max-width: 900px) {
+            .albums-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        .photo-card img {
+        @media (max-width: 580px) {
+            .albums-grid { grid-template-columns: 1fr; }
+        }
+
+        .album-card {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            group: hover;
+        }
+        .thumb-wrapper {
+            position: relative;
             width: 100%;
-            height: 250px;
+            aspect-ratio: 4 / 3;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #e5e7eb;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .thumb-wrapper img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             display: block;
             transition: transform 0.3s ease;
         }
-        .photo-card:hover img {
-            transform: scale(1.05); /* Slight zoom on hover */
+        .album-card:hover .thumb-wrapper img {
+            transform: scale(1.04);
+        }
+        .badge-lock {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .album-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 0 0 0.2rem 0;
+            color: #111827;
+        }
+        .album-date {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin: 0;
         }
     </style>
 </head>
@@ -58,25 +106,60 @@
 
     <header>
         <a href="/" class="back-link">← Back to Home</a>
-        <h1>My Photos</h1>
-        <p>A collection of my favorite shots.</p>
+        <h1>Photography</h1>
+        <p>Event galleries and archives.</p>
     </header>
 
-    <main class="gallery-container">
-        <!-- Photo 1 -->
-        <div class="photo-card">
-            <img src="images/photo1.jpg" alt="Description of first photo">
-        </div>
-        
-        <!-- Photo 2 -->
-        <div class="photo-card">
-            <img src="images/photo2.jpg" alt="Description of second photo">
-        </div>
+    <main class="albums-grid">
 
-        <!-- Photo 3 -->
-        <div class="photo-card">
-            <img src="images/photo3.jpg" alt="Description of third photo">
-        </div>
+        <!-- 1. SF Fleet Week 2026 (Most Recent - Unlocked) -->
+        <a href="/photos/sf-fleet-week-2026/" class="album-card">
+            <div class="thumb-wrapper">
+                <img src="thumbnails/fleet-week.jpg" alt="SF Fleet Week 2026">
+            </div>
+            <div class="album-title">SF Fleet Week 2026</div>
+            <div class="album-date">October 2026</div>
+        </a>
+
+        <!-- 2. eCoH Aug 2026 (Locked: jphill) -->
+        <a href="/photos/ecoh-aug-2026/" class="album-card">
+            <div class="thumb-wrapper">
+                <img src="thumbnails/ecoh.jpg" alt="eCoH Aug 2026">
+                <span class="badge-lock">🔒 Locked</span>
+            </div>
+            <div class="album-title">eCoH Aug 2026</div>
+            <div class="album-date">August 23, 2026</div>
+        </a>
+
+        <!-- 3. Wings Over Solano 2026 (Unlocked) -->
+        <a href="/photos/wings-over-solano-2026/" class="album-card">
+            <div class="thumb-wrapper">
+                <img src="thumbnails/solano.jpg" alt="Wings Over Solano 2026">
+            </div>
+            <div class="album-title">Wings Over Solano 2026</div>
+            <div class="album-date">April 25, 2026</div>
+        </a>
+
+        <!-- 4. Camp Chawanakee 2025 (Locked: sequoia) -->
+        <a href="/photos/camp-chawanakee-2025/" class="album-card">
+            <div class="thumb-wrapper">
+                <img src="thumbnails/chawanakee.jpg" alt="Camp Chawanakee 2025">
+                <span class="badge-lock">🔒 Locked</span>
+            </div>
+            <div class="album-title">Camp Chawanakee 2025</div>
+            <div class="album-date">July 27 – August 2, 2025</div>
+        </a>
+
+        <!-- 5. United Ummah Iftar 2025 (Oldest - Locked: msa2025) -->
+        <a href="/photos/united-ummah-iftar-2025/" class="album-card">
+            <div class="thumb-wrapper">
+                <img src="thumbnails/iftar.jpg" alt="United Ummah Iftar 2025">
+                <span class="badge-lock">🔒 Locked</span>
+            </div>
+            <div class="album-title">United Ummah Iftar 2025</div>
+            <div class="album-date">March 20, 2025</div>
+        </a>
+
     </main>
 
 </body>
