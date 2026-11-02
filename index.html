@@ -6,101 +6,301 @@
     <title>Ibrahim Rayees</title>
     <style>
         :root {
-            --bg: #ffffff;
-            --text: #111827;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --accent: #2563eb;
+            --bg-color: #030712;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
         }
-        * { box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 2rem;
+            padding: 0;
         }
-        .card {
-            max-width: 540px;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Futuristic Background Elements */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: linear-gradient(var(--card-border) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--card-border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+            z-index: -2;
+            opacity: 0.5;
+        }
+
+        .ambient-light {
+            position: fixed;
+            top: -20%; left: -10%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: pulse 8s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.4; }
+            100% { transform: scale(1.1) translate(5%, 5%); opacity: 0.7; }
+        }
+
+        /* Layout & Typography */
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        section {
+            min-height: 80vh; /* Ensures scrolling is required to see everything */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             width: 100%;
         }
+
         .location {
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
-            font-size: 0.9rem;
-            color: var(--muted);
-            font-weight: 500;
-            margin-bottom: 0.5rem;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-weight: 600;
         }
+
         h1 {
-            font-size: 2.75rem;
+            font-size: clamp(3rem, 8vw, 5rem);
             font-weight: 800;
-            letter-spacing: -0.03em;
-            margin: 0 0 1rem 0;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
         }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle shine effect on card */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-20deg);
+            animation: shine 6s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
         p.bio {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #374151;
-            margin: 0 0 2rem 0;
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
         }
+
+        /* Buttons */
         .links {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.85rem;
+            gap: 1rem;
         }
+
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.35rem;
-            border-radius: 8px;
+            gap: 0.75rem;
+            padding: 0.85rem 1.75rem;
+            border-radius: 12px;
             font-weight: 600;
             font-size: 0.95rem;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
+
         .btn-primary {
-            background-color: var(--text);
-            color: #ffffff;
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
+
         .btn-primary:hover {
-            background-color: #374151;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
         }
+
         .btn-secondary {
-            background-color: #f3f4f6;
-            color: var(--text);
-            border: 1px solid var(--border);
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid var(--card-border);
         }
+
         .btn-secondary:hover {
-            background-color: #e5e7eb;
-            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
+
+        /* Footer & Instagram */
+        footer {
+            min-height: 20vh;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 2rem;
+            width: 100%;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .social-link:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .social-link svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Scroll Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
     </style>
 </head>
 <body>
 
-    <main class="card">
-        <div class="location">📍 Santa Clara, CA</div>
-        <h1>Ibrahim Rayees</h1>
-        <p class="bio">
-            Welcome to my personal corner of the internet. Check out my photography archives from recent events, camps, and airshows, or connect with me on LinkedIn.
-        </p>
+    <!-- Background Engine -->
+    <div class="bg-grid"></div>
+    <div class="ambient-light"></div>
 
-        <div class="links">
-            <a href="/photos/" class="btn btn-primary">📸 View Photo Albums</a>
-            <!-- Replace the URL below with your exact LinkedIn link -->
-            <a href="https://www.linkedin.com/in/ibrahimrayees/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
-                LinkedIn ↗
+    <main>
+        <!-- Hero Section -->
+        <section>
+            <div class="reveal">
+                <div class="location">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    Santa Clara, CA
+                </div>
+            </div>
+            <h1 class="reveal delay-1">Ibrahim Rayees</h1>
+            <!-- Scroll indicator to prompt user behavior -->
+            <div class="reveal delay-2" style="margin-top: 2rem; opacity: 0.5;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: pulse 2s infinite;"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+            </div>
+        </section>
+
+        <!-- Content Section -->
+        <section>
+            <div class="glass-card reveal">
+                <p class="bio">
+                    Welcome to my personal corner of the internet. Check out my photography archives from recent events, camps, and airshows, or connect with me professionally.
+                </p>
+
+                <div class="links">
+                    <a href="/photos/" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        View Photo Albums
+                    </a>
+                    <a href="https://www.linkedin.com/in/ibrahimrayees/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                        LinkedIn
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer / Instagram Section -->
+        <footer>
+            <a href="https://instagram.com/_ir123_" target="_blank" rel="noopener noreferrer" class="social-link reveal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                _ir123_
             </a>
-        </div>
+        </footer>
     </main>
 
+    <!-- Scroll Animation Script -->
+    <script>
+        function revealOnScroll() {
+            var reveals = document.querySelectorAll('.reveal');
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100; // triggers when element is 100px from viewport bottom
+
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add('active');
+                }
+            }
+        }
+
+        // Run once on load to reveal elements already in viewport
+        window.addEventListener('load', revealOnScroll);
+        // Run on scroll
+        window.addEventListener('scroll', revealOnScroll);
+    </script>
 </body>
 </html>
