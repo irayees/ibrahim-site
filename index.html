@@ -9,7 +9,7 @@
             --bg: #09090b;
             --text-main: #ffffff;
             --text-muted: #71717a;
-            /* High-energy tech cyan/blue */
+            /* High-energy tech cyan/blue for the site accents */
             --accent: #00f0ff; 
             --accent-hover: #00c3cc;
         }
@@ -31,7 +31,7 @@
             flex-direction: column;
         }
 
-        /* --- Custom Cursor --- */
+        /* --- Professional Custom Cursor --- */
         .cursor-dot,
         .cursor-outline {
             position: fixed;
@@ -43,16 +43,19 @@
         }
 
         .cursor-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent);
+            width: 5px;
+            height: 5px;
+            background-color: #ffffff; /* Clean white dot */
         }
 
         .cursor-outline {
-            width: 40px;
-            height: 40px;
-            border: 1px solid var(--accent);
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            width: 32px;
+            height: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.4); /* Subtle translucent ring */
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                        height 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                        background-color 0.3s ease,
+                        border-color 0.3s ease;
         }
 
         /* Hide custom cursor on touch devices */
@@ -130,7 +133,6 @@
         }
 
         h1 {
-            /* Reduced font size for a cleaner look */
             font-size: clamp(2.5rem, 8vw, 5.5rem);
             font-weight: 900;
             line-height: 0.95;
@@ -350,18 +352,20 @@
         }
         animateCursor();
 
-        // Enlarge cursor when hovering over links
+        // Professional hover effect for links
         const interactiveElements = document.querySelectorAll('a, .btn');
         interactiveElements.forEach(el => {
             el.addEventListener('mouseenter', () => {
-                cursorOutline.style.width = '60px';
-                cursorOutline.style.height = '60px';
-                cursorOutline.style.backgroundColor = 'rgba(0, 240, 255, 0.1)';
+                cursorOutline.style.width = '48px';
+                cursorOutline.style.height = '48px';
+                cursorOutline.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                cursorOutline.style.borderColor = 'rgba(255, 255, 255, 0.1)';
             });
             el.addEventListener('mouseleave', () => {
-                cursorOutline.style.width = '40px';
-                cursorOutline.style.height = '40px';
+                cursorOutline.style.width = '32px';
+                cursorOutline.style.height = '32px';
                 cursorOutline.style.backgroundColor = 'transparent';
+                cursorOutline.style.borderColor = 'rgba(255, 255, 255, 0.4)';
             });
         });
 
