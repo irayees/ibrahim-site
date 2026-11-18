@@ -1613,6 +1613,24 @@
       return document.visibilityState === "visible" ? Date.now() : 0;
     }
 
+    let unsubscribeProfileListener = null;
+
+    async function syncPresenceHeartbeat() {
+      userProfile.lastActive = getEffectiveLastActive();
+      saveLocalProfile();
+      updatePresenceUI();
+      if (db && currentUser) {
+        try {
+          await updateDoc(doc(db, "users", currentUser.uid), {
+            lastActive: userProfile.lastActive,
+            presenceMode: userProfile.presenceMode || "automatic"
+          });
+        } catch (err) {
+          console.warn("Presence heartbeat skipped:", err.message);
+        }
+      }
+    }
+
     async function syncProfileToCloud() {
       userProfile.lastActive = getEffectiveLastActive();
       saveLocalProfile();
@@ -1658,6 +1676,23 @@
           await logPlayerAction("PRESENCE", "Created new cloud player account");
         }
         await syncProfileToCloud();
+        if (unsubscribeProfileListener) unsubscribeProfileListener();
+        unsubscribeProfileListener = onSnapshot(doc(db, "users", user.uid), (liveSnap) => {
+          if (!liveSnap.exists() || !currentUser || currentUser.uid !== user.uid) return;
+          const liveData = liveSnap.data();
+          const base = createDefaultProfile();
+          userProfile = {
+            ...base,
+            ...userProfile,
+            ...liveData,
+            uid: user.uid,
+            equippedSkins: { ...base.equippedSkins, ...(liveData.equippedSkins || {}) },
+            highScores: { ...base.highScores, ...(liveData.highScores || {}) }
+          };
+          saveLocalProfile();
+          updateHud();
+          updateAuthUI();
+        });
       } catch (err) {
         console.warn("Could not read cloud profile:", err.message);
       }
@@ -1852,7 +1887,7 @@
 
     document.addEventListener("visibilitychange", () => {
       if (userProfile.presenceMode === "automatic") {
-        syncProfileToCloud();
+        syncPresenceHeartbeat();
       }
     });
 
@@ -1865,7 +1900,7 @@
 
     setInterval(() => {
       if (userProfile.presenceMode === "automatic" && document.visibilityState === "visible") {
-        syncProfileToCloud();
+        syncPresenceHeartbeat();
       }
     }, 45000);
 
@@ -2740,6 +2775,7 @@
           await updateDoc(doc(db, "users", uid), { [field]: increment(delta) });
         } catch (e) {
           showToast("⚠️ Firestore rule prevented updating other user: " + e.message);
+          return;
         }
       }
       await logPlayerAction("ADMIN", `Adjusted ${field} by ${delta > 0 ? '+' : ''}${delta} for player ${uid}`);
