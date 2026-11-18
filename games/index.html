@@ -1,0 +1,3308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARCADE NEXUS — Play 18+ Games</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-void: #06080f;
+      --bg-surface: #0d1220;
+      --bg-card: #12192c;
+      --bg-card-hover: #18223c;
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --border-glow: rgba(99, 102, 241, 0.45);
+      --accent-primary: #6366f1;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-void);
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(99, 102, 241, 0.14) 0%, transparent 40%),
+        radial-gradient(circle at 85% 15%, rgba(6, 182, 212, 0.12) 0%, transparent 42%),
+        radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.10) 0%, transparent 45%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-void); }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(6, 8, 15, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 1.2rem;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
+    }
+
+    .brand-text {
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      background: linear-gradient(90deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .hud-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(18, 25, 44, 0.9);
+      border: 1px solid var(--border-subtle);
+      padding: 0.45rem 0.85rem;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .hud-coin { color: var(--accent-amber); }
+    .hud-gem { color: var(--accent-cyan); }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 0.55rem 1rem;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.18s ease;
+      color: #fff;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary), #4f46e5);
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+    .btn-primary:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
+    .btn-redeem {
+      background: linear-gradient(135deg, var(--accent-amber), #d97706);
+      color: #090d16;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+    }
+    .btn-redeem:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+    .btn-admin {
+      background: linear-gradient(135deg, var(--accent-rose), #e11d48);
+      box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
+    }
+    .btn-admin:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: rgba(30, 41, 59, 0.65);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+    }
+    .btn-ghost:hover { background: rgba(51, 65, 85, 0.8); border-color: rgba(148,163,184,0.35); }
+
+    /* Hero */
+    .hero {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(18, 25, 44, 0.92), rgba(13, 18, 32, 0.96));
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 2rem 2.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.18), transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-title {
+      font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+      font-weight: 900;
+      line-height: 1.12;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title span {
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-primary), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .cat-tab {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .cat-tab:hover { color: #fff; border-color: rgba(148,163,184,0.35); }
+    .cat-tab.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.4);
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 260px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .search-box input:focus { border-color: var(--accent-cyan); }
+
+    /* Game Grid */
+    .game-grid {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 0.5rem 2rem 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+      gap: 1.35rem;
+    }
+
+    .game-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .game-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--border-glow);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45), 0 0 22px rgba(99, 102, 241, 0.18);
+      background: var(--bg-card-hover);
+    }
+
+    .card-banner {
+      height: 132px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(6, 8, 15, 0.72);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #e2e8f0;
+    }
+
+    .card-body {
+      padding: 1.15rem 1.25rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 0.5rem;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      flex: 1;
+    }
+
+    .card-footer {
+      margin-top: 0.65rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(148,163,184,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    .best-score {
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      font-weight: 700;
+    }
+
+    .play-pill {
+      background: rgba(99, 102, 241, 0.18);
+      color: #a5b4fc;
+      padding: 0.3rem 0.75rem;
+      border-radius: 8px;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+
+    .game-card:hover .play-pill {
+      background: var(--accent-primary);
+      color: #fff;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 5, 10, 0.86);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 1.75rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+      position: relative;
+    }
+
+    .modal-box.game-modal-box {
+      max-width: 1020px;
+      padding: 1.25rem 1.5rem 1.5rem;
+    }
+
+    .modal-box.admin-modal-box {
+      max-width: 860px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.15rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .close-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--border-subtle);
+      color: #cbd5e1;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      font-size: 1.15rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+    .close-btn:hover { background: var(--accent-rose); color: #fff; border-color: var(--accent-rose); }
+
+    /* Form Controls */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-control {
+      background: var(--bg-void);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.65rem 0.9rem;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      outline: none;
+      width: 100%;
+    }
+    .form-control:focus { border-color: var(--accent-primary); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Game Stage */
+    .game-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+      flex-wrap: wrap;
+      background: var(--bg-void);
+      padding: 0.6rem 0.9rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .game-stage {
+      background: #04060b;
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 14px;
+      min-height: 460px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 1rem;
+    }
+
+    canvas.game-canvas {
+      background: #050811;
+      border-radius: 10px;
+      max-width: 100%;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      display: block;
+    }
+
+    /* Skin Selector Strip */
+    .skin-strip {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .skin-chip {
+      padding: 0.3rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .skin-chip.equipped {
+      border-color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.18);
+      color: #fff;
+    }
+    .skin-chip.locked {
+      opacity: 0.55;
+    }
+
+    /* Admin Table */
+    .codes-table-wrap {
+      overflow-x: auto;
+      margin-top: 1rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 0.75rem 0.9rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    th {
+      background: var(--bg-void);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .code-badge {
+      font-family: var(--font-mono);
+      background: rgba(99, 102, 241, 0.16);
+      color: #a5b4fc;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      font-weight: 700;
+      border: 1px solid rgba(99, 102, 241, 0.35);
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      color: #fff;
+      padding: 0.85rem 1.2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
+      animation: slideIn 0.22s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVIGATION -->
+  <header class="navbar">
+    <a href="#" class="brand" onclick="closeAllModals(); return false;">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">ARCADE NEXUS</div>
+    </a>
+
+    <div class="nav-actions">
+      <div class="hud-pill hud-coin" title="Arcade Coins">🪙 <span id="hudCoins">500</span></div>
+      <div class="hud-pill hud-gem" title="Nexus Gems">💎 <span id="hudGems">10</span></div>
+      <button class="btn btn-ghost" id="soundToggleBtn" onclick="toggleSound()">🔊 SFX</button>
+      <button class="btn btn-redeem" onclick="openModal('redeemModal')">🎟️ Redeem Code</button>
+      <button class="btn btn-admin" id="adminNavBtn" style="display:none;" onclick="openAdminModal()">🛡️ Admin Panel</button>
+      <button class="btn btn-primary" id="authNavBtn" onclick="openModal('authModal')">👤 Sign In</button>
+    </div>
+  </header>
+
+  <!-- HERO & FILTER BAR -->
+  <section class="hero">
+    <div class="hero-banner">
+      <div>
+        <h1 class="hero-title">Next-Gen Browser <span>Arcade Vault</span></h1>
+        <p class="hero-sub">18 handcrafted high-FPS games with cloud account sync, unlockable custom skins, powerups, and live promo code rewards.</p>
+      </div>
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+        <button class="btn btn-redeem" onclick="openModal('redeemModal')">🎁 Enter Promo Code</button>
+        <button class="btn btn-ghost" onclick="openModal('lockerModal')">🎨 Skins & Powerups Locker</button>
+      </div>
+    </div>
+
+    <div class="controls-bar">
+      <div class="category-tabs" id="categoryTabs">
+        <button class="cat-tab active" data-cat="all">All Games (18)</button>
+        <button class="cat-tab" data-cat="clicker">Idle & Clicker</button>
+        <button class="cat-tab" data-cat="racing">Racing & Action</button>
+        <button class="cat-tab" data-cat="arcade">Classic Arcade</button>
+        <button class="cat-tab" data-cat="puzzle">Puzzle & Board</button>
+        <button class="cat-tab" data-cat="reflex">Reflex & Skill</button>
+      </div>
+      <div class="search-box">
+        <input type="text" id="gameSearchInput" placeholder="Search 18 games..." oninput="renderGameGrid()" />
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME GRID -->
+  <main class="game-grid" id="gameGrid"></main>
+
+  <!-- GAME PLAY MODAL -->
+  <div class="modal-backdrop" id="gameModal">
+    <div class="modal-box game-modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span id="activeGameIcon">🎮</span>
+          <span id="activeGameTitle">Game Title</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+          <button class="btn btn-redeem" style="padding:0.4rem 0.75rem; font-size:0.8rem;" onclick="openModal('redeemModal')">🎟️ Redeem Code</button>
+          <button class="btn btn-ghost" style="padding:0.4rem 0.75rem; font-size:0.8rem;" onclick="restartActiveGame()">↻ Restart</button>
+          <button class="close-btn" onclick="closeGameModal()">✕</button>
+        </div>
+      </div>
+
+      <div class="game-toolbar">
+        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+          <span style="font-size:0.78rem; color:var(--text-muted); font-weight:700;">EQUIPPED SKIN:</span>
+          <div class="skin-strip" id="activeGameSkins"></div>
+        </div>
+        <div style="font-family:var(--font-mono); font-size:0.82rem; color:var(--accent-cyan);">
+          BEST: <span id="activeGameBest">0</span>
+        </div>
+      </div>
+
+      <div class="game-stage" id="gameStage"></div>
+      <div id="activeGameControlsHint" style="margin-top:0.7rem; font-size:0.82rem; color:var(--text-muted); text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- REDEEM CODE MODAL -->
+  <div class="modal-backdrop" id="redeemModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🎟️ Redeem Reward Code</div>
+        <button class="close-btn" onclick="closeModal('redeemModal')">✕</button>
+      </div>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">
+        Enter a promo or creator code to unlock exclusive game skins, coins, gems, or permanent powerups across the arcade.
+      </p>
+      <div class="form-group">
+        <label>Promo Code</label>
+        <input type="text" id="redeemCodeInput" class="form-control" placeholder="e.g. NEXUS2026" style="font-family:var(--font-mono); text-transform:uppercase; font-size:1.1rem; letter-spacing:0.08em;" />
+      </div>
+      <button class="btn btn-redeem" style="width:100%; justify-content:center; padding:0.75rem; font-size:1rem;" onclick="handleRedeemCode()">
+        ⚡ Claim Reward Now
+      </button>
+      <div style="margin-top:1.1rem; padding-top:0.9rem; border-top:1px solid var(--border-subtle); font-size:0.8rem; color:var(--text-muted);">
+        Starter starter code to test right away: <span class="code-badge">WELCOME500</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOCKER (SKINS & POWERUPS) MODAL -->
+  <div class="modal-backdrop" id="lockerModal">
+    <div class="modal-box admin-modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🎨 Skins & Powerups Locker</div>
+        <button class="close-btn" onclick="closeModal('lockerModal')">✕</button>
+      </div>
+      <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1rem;">
+        Unlock skins and boosts using earned Arcade Coins or exclusive Redeem Codes!
+      </p>
+      <h4 style="margin-bottom:0.6rem; color:var(--accent-cyan);">⚡ Global & Game Powerups</h4>
+      <div id="lockerPowerupsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:0.75rem; margin-bottom:1.4rem;"></div>
+      <h4 style="margin-bottom:0.6rem; color:var(--accent-amber);">✨ Custom Game Skins</h4>
+      <div id="lockerSkinsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:0.75rem;"></div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">👤 Player Account</div>
+        <button class="close-btn" onclick="closeModal('authModal')">✕</button>
+      </div>
+
+      <div id="signedOutView">
+        <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1rem;">
+          Sign in to sync your coins, unlocked skins, high scores, and redeemed codes across devices.
+        </p>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="authEmail" class="form-control" placeholder="player@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" class="form-control" placeholder="••••••••" />
+        </div>
+        <div style="display:flex; gap:0.65rem; margin-bottom:0.85rem;">
+          <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="emailSignIn()">Sign In</button>
+          <button class="btn btn-ghost" style="flex:1; justify-content:center;" onclick="emailSignUp()">Create Account</button>
+        </div>
+        <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="googleSignIn()">
+          🌐 Continue with Google
+        </button>
+        <div id="firebaseStatusBanner" style="margin-top:1rem; padding:0.7rem; border-radius:10px; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); font-size:0.8rem; color:#fcd34d;"></div>
+      </div>
+
+      <div id="signedInView" style="display:none;">
+        <div style="background:var(--bg-void); padding:1rem; border-radius:12px; border:1px solid var(--border-subtle); margin-bottom:1rem;">
+          <div style="font-size:0.8rem; color:var(--text-muted);">SIGNED IN AS</div>
+          <div id="userEmailDisplay" style="font-weight:800; font-size:1.05rem; margin-top:0.2rem;"></div>
+          <div id="userRoleBadge" style="margin-top:0.4rem; display:inline-block; font-size:0.75rem; padding:0.2rem 0.6rem; border-radius:999px; background:rgba(16,185,129,0.18); color:#34d399; font-weight:700;">PLAYER</div>
+        </div>
+        <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="signOutUser()">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OWNER ADMIN DASHBOARD MODAL -->
+  <div class="modal-backdrop" id="adminModal">
+    <div class="modal-box admin-modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🛡️ Owner Admin Dashboard — Code Generator</div>
+        <button class="close-btn" onclick="closeModal('adminModal')">✕</button>
+      </div>
+
+      <div style="background:var(--bg-void); border:1px solid var(--border-subtle); border-radius:14px; padding:1.15rem; margin-bottom:1.25rem;">
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Custom Code (or Click Randomize)</label>
+            <div style="display:flex; gap:0.5rem;">
+              <input type="text" id="adminCodeString" class="form-control" placeholder="e.g. MEGA999" style="font-family:var(--font-mono); text-transform:uppercase; font-weight:700;" />
+              <button class="btn btn-primary" type="button" onclick="randomizeAdminCode()" title="Generate Random Code">🎲 Random</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Target Game</label>
+            <select id="adminTargetGame" class="form-control">
+              <option value="all">🌐 All Games (Global Reward)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Reward Type</label>
+            <select id="adminRewardType" class="form-control" onchange="updateAdminRewardInputs()">
+              <option value="coins">🪙 Arcade Coins</option>
+              <option value="gems">💎 Nexus Gems</option>
+              <option value="skin">🎨 Unlock Specific Skin</option>
+              <option value="all_skins">👑 Unlock ALL Skins (Every Game)</option>
+              <option value="powerup">⚡ Unlock Powerup / Upgrade</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="adminAmountGroup">
+            <label id="adminAmountLabel">Coin / Gem Amount</label>
+            <input type="number" id="adminRewardAmount" class="form-control" value="2500" min="1" />
+          </div>
+
+          <div class="form-group" id="adminSkinGroup" style="display:none;">
+            <label>Select Skin to Unlock</label>
+            <select id="adminSkinSelect" class="form-control"></select>
+          </div>
+
+          <div class="form-group" id="adminPowerupGroup" style="display:none;">
+            <label>Select Powerup / Upgrade</label>
+            <select id="adminPowerupSelect" class="form-control"></select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Max Total Uses (0 = Unlimited)</label>
+            <input type="number" id="adminMaxUses" class="form-control" value="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Internal Note (Optional)</label>
+            <input type="text" id="adminCodeNote" class="form-control" placeholder="e.g. Weekend Drop" />
+          </div>
+        </div>
+
+        <button class="btn btn-admin" style="width:100%; justify-content:center; padding:0.75rem; font-size:0.95rem;" onclick="createAdminCode()">
+          ✨ Publish Live Redeem Code
+        </button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h4 style="font-size:0.95rem;">Active & Created Codes</h4>
+        <span id="adminCodesCount" style="font-size:0.8rem; color:var(--text-muted);">0 codes</span>
+      </div>
+
+      <div class="codes-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Game</th>
+              <th>Reward</th>
+              <th>Uses</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminCodesTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- FIREBASE & ARCADE ENGINE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      collection,
+      getDocs,
+      deleteDoc,
+      increment
+    } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+    // =========================================================================
+    // 1. FIREBASE CONFIGURATION (PASTE YOUR FIREBASE PROJECT CONFIG BELOW)
+    // =========================================================================
+const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyAEW3SDW4Zz5gYIkN1zF0MNawxBu69H4k4",
+      authDomain: "arcade--nexus.firebaseapp.com",
+      projectId: "arcade--nexus",
+      storageBucket: "arcade--nexus.firebasestorage.app",
+      messagingSenderId: "257930347387",
+      appId: "1:257930347387:web:42104a72369fb64bb933de"
+    };
+
+    // Replace with the email address you will sign in with as Owner:
+    const ADMIN_EMAILS = [
+      "ibrahim.rayees2@gmail.com"
+    ];
+
+    const isFirebaseConfigured = FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.includes("YOUR_");
+    let app = null, auth = null, db = null;
+
+    if (isFirebaseConfigured) {
+      try {
+        app = initializeApp(FIREBASE_CONFIG);
+        auth = getAuth(app);
+        db = getFirestore(app);
+      } catch (err) {
+        console.error("Firebase init error:", err);
+      }
+    }
+
+    // =========================================================================
+    // 2. CATALOG: SKINS, POWERUPS, AND 18 GAMES
+    // =========================================================================
+    const SKINS_CATALOG = [
+      { id: "cookie_classic", game: "cookie", name: "Choc Chip", color: "#d97706", accent: "#78350f", price: 0 },
+      { id: "cookie_gold", game: "cookie", name: "Royal Gold", color: "#fbbf24", accent: "#fef08a", price: 1200 },
+      { id: "cookie_cyber", game: "cookie", name: "Neon Plasma", color: "#06b6d4", accent: "#a855f7", price: 2500 },
+      { id: "cookie_galaxy", game: "cookie", name: "Void Nebula", color: "#8b5cf6", accent: "#ec4899", price: 5000 },
+
+      { id: "car_red", game: "drift", name: "Apex Crimson", color: "#ef4444", accent: "#fca5a5", price: 0 },
+      { id: "car_cyan", game: "drift", name: "Cyber Pulse", color: "#06b6d4", accent: "#67e8f9", price: 1500 },
+      { id: "car_gold", game: "drift", name: "Solar Hypercar", color: "#f59e0b", accent: "#fde047", price: 3000 },
+      { id: "car_stealth", game: "drift", name: "Obsidian Ghost", color: "#a855f7", accent: "#e9d5ff", price: 4500 },
+
+      { id: "rally_blue", game: "rally", name: "Cobalt GT", color: "#3b82f6", accent: "#93c5fd", price: 0 },
+      { id: "rally_neon", game: "rally", name: "Synthwave 84", color: "#ec4899", accent: "#22d3ee", price: 2000 },
+      { id: "rally_gold", game: "rally", name: "Champion Gold", color: "#eab308", accent: "#fef9c3", price: 3500 },
+
+      { id: "snake_emerald", game: "snake", name: "Emerald Viper", color: "#10b981", accent: "#6ee7b7", price: 0 },
+      { id: "snake_plasma", game: "snake", name: "Plasma Dragon", color: "#a855f7", accent: "#38bdf8", price: 1500 },
+      { id: "snake_gold", game: "snake", name: "Golden Cobra", color: "#f59e0b", accent: "#fef08a", price: 3000 },
+
+      { id: "ship_cobalt", game: "invaders", name: "Vanguard Blue", color: "#38bdf8", accent: "#bae6fd", price: 0 },
+      { id: "ship_crimson", game: "invaders", name: "Crimson Fury", color: "#f43f5e", accent: "#fecdd3", price: 1800 },
+      { id: "ship_nova", game: "invaders", name: "Supernova Gold", color: "#fbbf24", accent: "#a855f7", price: 3500 },
+
+      { id: "bird_cyan", game: "flappy", name: "Cyber Falcon", color: "#06b6d4", accent: "#cffafe", price: 0 },
+      { id: "bird_phoenix", game: "flappy", name: "Solar Phoenix", color: "#f97316", accent: "#fde047", price: 1600 },
+
+      { id: "paddle_indigo", game: "breakout", name: "Prism Core", color: "#6366f1", accent: "#c7d2fe", price: 0 },
+      { id: "paddle_emerald", game: "breakout", name: "Matrix Laser", color: "#10b981", accent: "#a7f3d0", price: 1600 }
+    ];
+
+    const POWERUPS_CATALOG = [
+      { id: "double_coins", name: "2x Arcade Coins", desc: "Earn double coins across all 18 games permanently.", price: 3000 },
+      { id: "cookie_2x", name: "2x Cookie Click & CPS", desc: "Doubles all cookie clicks and building output.", price: 2500 },
+      { id: "nitro_max", name: "Infinite Hyper Nitro", desc: "Unlimited boost charge in Neon Drift & Cyber Rally.", price: 2500 },
+      { id: "shield_start", name: "Aegis Start Shield", desc: "Absorb 1 fatal crash in Drift, Flappy, Dino & Invaders.", price: 2200 },
+      { id: "rapid_laser", name: "Twin Rapid Lasers", desc: "Double fire rate in Star Vanguard & Asteroid Belt.", price: 2400 }
+    ];
+
+    const GAMES_LIST = [
+      { id: "cookie", title: "Cookie Empire", cat: "clicker", icon: "🍪", bg: "linear-gradient(135deg,#78350f,#b45309)", desc: "Bake billions of cookies, hire cosmic bakeries, catch golden cookies & trigger prestige." },
+      { id: "drift", title: "Neon Drift", cat: "racing", icon: "🏎️", bg: "linear-gradient(135deg,#1e1b4b,#be123c)", desc: "High-speed highway dodging with drift physics, nitro boost, coin lanes & traffic weaves." },
+      { id: "rally", title: "Cyber Rally 3D", cat: "racing", icon: "🚘", bg: "linear-gradient(135deg,#0f172a,#0284c7)", desc: "Pseudo-3D OutRun-style horizon racer with sweeping curves, turbo speed & rival cars." },
+      { id: "snake", title: "Neon Snake", cat: "arcade", icon: "🐍", bg: "linear-gradient(135deg,#064e3b,#059669)", desc: "Glowing cyber-serpent with combo orbs, speed tiers and custom plasma trails." },
+      { id: "tetris", title: "Block Matrix", cat: "puzzle", icon: "🧱", bg: "linear-gradient(135deg,#312e81,#6d28d9)", desc: "Fast-paced falling tetrominoes with ghost preview, hard-drop & line-clear combos." },
+      { id: "flappy", title: "Sky Flap", cat: "arcade", icon: "🦅", bg: "linear-gradient(135deg,#0c4a6e,#0891b2)", desc: "Thread the neon laser gates in a glowing cyberpunk skyline with shield support." },
+      { id: "breakout", title: "Prism Breakout", cat: "arcade", icon: "💎", bg: "linear-gradient(135deg,#4c1d95,#db2777)", desc: "Shatter multi-armor neon bricks with multiball drops, wide paddles & particle bursts." },
+      { id: "invaders", title: "Star Vanguard", cat: "arcade", icon: "👾", bg: "linear-gradient(135deg,#090d16,#4338ca)", desc: "Defend the sector against descending alien armadas with twin-plasma cannons." },
+      { id: "2048", title: "2048 Quantum", cat: "puzzle", icon: "🔢", bg: "linear-gradient(135deg,#7c2d12,#ea580c)", desc: "Merge glowing energy tiles to reach 2048 and beyond in this sleek logic classic." },
+      { id: "minesweeper", title: "Cyber Sweeper", cat: "puzzle", icon: "💣", bg: "linear-gradient(135deg,#1e293b,#475569)", desc: "Clear the digital minefield using logic deduction and right-click flags." },
+      { id: "pong", title: "Hyper Pong", cat: "arcade", icon: "🏓", bg: "linear-gradient(135deg,#065f46,#0d9488)", desc: "High-velocity neon table tennis against an adaptive AI with spin physics." },
+      { id: "pacman", title: "Maze Runner", cat: "arcade", icon: "🟡", bg: "linear-gradient(135deg,#713f12,#ca8a04)", desc: "Clear every energy pellet in the neon labyrinth while outsmarting 4 cyber ghosts." },
+      { id: "asteroids", title: "Asteroid Belt", cat: "racing", icon: "☄️", bg: "linear-gradient(135deg,#111827,#374151)", desc: "360-degree zero-gravity space combat blasting splitting meteor fields." },
+      { id: "dino", title: "Cyber Dino Run", cat: "reflex", icon: "🦖", bg: "linear-gradient(135deg,#14532d,#15803d)", desc: "Leap over laser cacti and duck under patrol drones at escalating velocity." },
+      { id: "memory", title: "Memory Matrix", cat: "puzzle", icon: "🧠", bg: "linear-gradient(135deg,#581c87,#9333ea)", desc: "Match pairs of glowing cyber glyphs against the clock for streak multipliers." },
+      { id: "aim", title: "Reflex Aim Lab", cat: "reflex", icon: "🎯", bg: "linear-gradient(135deg,#881337,#e11d48)", desc: "30-second precision target trainer measuring reaction speed, accuracy & streaks." },
+      { id: "simon", title: "Synth Simon", cat: "reflex", icon: "🎵", bg: "linear-gradient(135deg,#1e3a8a,#2563eb)", desc: "Repeat escalating Web-Audio synth light sequences as tempo accelerates." },
+      { id: "connect4", title: "Connect 4 Arena", cat: "puzzle", icon: "🔴", bg: "linear-gradient(135deg,#7f1d1d,#1d4ed8)", desc: "Drop glowing discs to outmaneuver a tactical AI four-in-a-row." }
+    ];
+
+    // =========================================================================
+    // 3. STATE MANAGEMENT (CLOUD FIRESTORE + LOCAL STORAGE FALLBACK)
+    // =========================================================================
+    const DEFAULT_PROFILE = {
+      coins: 500,
+      gems: 10,
+      unlockedSkins: [
+        "cookie_classic", "car_red", "rally_blue", "snake_emerald",
+        "ship_cobalt", "bird_cyan", "paddle_indigo"
+      ],
+      equippedSkins: {
+        cookie: "cookie_classic",
+        drift: "car_red",
+        rally: "rally_blue",
+        snake: "snake_emerald",
+        invaders: "ship_cobalt",
+        flappy: "bird_cyan",
+        breakout: "paddle_indigo"
+      },
+      powerups: [],
+      redeemedCodes: [],
+      highScores: {}
+    };
+
+    const DEFAULT_CODES = [
+      {
+        code: "WELCOME500",
+        game: "all",
+        rewardType: "coins",
+        amount: 500,
+        skinId: "",
+        powerupId: "",
+        maxUses: 0,
+        usedCount: 0,
+        active: true,
+        note: "Starter Welcome Bonus"
+      }
+    ];
+
+    let currentUser = null;
+    let userProfile = loadLocalProfile();
+    let localCodes = loadLocalCodes();
+    let soundEnabled = true;
+    let activeCategory = "all";
+    let activeGameId = null;
+    let activeGameCleanup = null;
+
+    function loadLocalProfile() {
+      try {
+        const raw = localStorage.getItem("arcade_nexus_profile_v1");
+        if (raw) return { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_PROFILE));
+    }
+
+    function saveLocalProfile() {
+      try {
+        localStorage.setItem("arcade_nexus_profile_v1", JSON.stringify(userProfile));
+      } catch (e) {}
+    }
+
+    function loadLocalCodes() {
+      try {
+        const raw = localStorage.getItem("arcade_nexus_codes_v1");
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_CODES));
+    }
+
+    function saveLocalCodes() {
+      try {
+        localStorage.setItem("arcade_nexus_codes_v1", JSON.stringify(localCodes));
+      } catch (e) {}
+    }
+
+    async function syncProfileToCloud() {
+      saveLocalProfile();
+      updateHud();
+      if (db && currentUser) {
+        try {
+          await setDoc(doc(db, "users", currentUser.uid), userProfile, { merge: true });
+        } catch (err) {
+          console.warn("Cloud sync skipped:", err.message);
+        }
+      }
+    }
+
+    async function loadProfileFromCloud(user) {
+      if (!db || !user) return;
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (snap.exists()) {
+          const cloudData = snap.data();
+          userProfile = {
+            ...DEFAULT_PROFILE,
+            ...cloudData,
+            equippedSkins: { ...DEFAULT_PROFILE.equippedSkins, ...(cloudData.equippedSkins || {}) },
+            highScores: { ...DEFAULT_PROFILE.highScores, ...(cloudData.highScores || {}) }
+          };
+          saveLocalProfile();
+        } else {
+          await setDoc(doc(db, "users", user.uid), userProfile);
+        }
+      } catch (err) {
+        console.warn("Could not read cloud profile:", err.message);
+      }
+      updateHud();
+      renderGameGrid();
+    }
+
+    // =========================================================================
+    // 4. WEB AUDIO SYNTHESIZER (ZERO EXTERNAL ASSETS NEEDED)
+    // =========================================================================
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    const SFX = {
+      play(type) {
+        if (!soundEnabled) return;
+        try {
+          if (!audioCtx) audioCtx = new AudioCtx();
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          const now = audioCtx.currentTime;
+
+          if (type === "coin") {
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(880, now);
+            osc.frequency.exponentialRampToValueAtTime(1320, now + 0.09);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+            osc.start(now); osc.stop(now + 0.12);
+          } else if (type === "hit") {
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(240, now);
+            osc.frequency.exponentialRampToValueAtTime(90, now + 0.08);
+            gain.gain.setValueAtTime(0.14, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+            osc.start(now); osc.stop(now + 0.09);
+          } else if (type === "powerup") {
+            osc.type = "sawtooth";
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(1180, now + 0.25);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+            osc.start(now); osc.stop(now + 0.26);
+          } else if (type === "gameover") {
+            osc.type = "sawtooth";
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.linearRampToValueAtTime(95, now + 0.35);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
+            osc.start(now); osc.stop(now + 0.36);
+          } else {
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(520, now);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+            osc.start(now); osc.stop(now + 0.06);
+          }
+        } catch (e) {}
+      },
+      tone(freq, dur = 0.22) {
+        if (!soundEnabled) return;
+        try {
+          if (!audioCtx) audioCtx = new AudioCtx();
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.16, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.start(); osc.stop(audioCtx.currentTime + dur);
+        } catch (e) {}
+      }
+    };
+
+    window.toggleSound = () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById("soundToggleBtn").textContent = soundEnabled ? "🔊 SFX" : "🔇 Muted";
+    };
+
+    // =========================================================================
+    // 5. SHARED GAME API (COINS, HIGH SCORES, SKINS, POWERUPS)
+    // =========================================================================
+    const GameAPI = {
+      addCoins(amount) {
+        const mult = userProfile.powerups.includes("double_coins") ? 2 : 1;
+        const gained = Math.max(1, Math.round(amount * mult));
+        userProfile.coins += gained;
+        updateHud();
+        syncProfileToCloud();
+        return gained;
+      },
+      addGems(amount) {
+        userProfile.gems += amount;
+        updateHud();
+        syncProfileToCloud();
+      },
+      submitScore(gameId, score) {
+        const prev = userProfile.highScores[gameId] || 0;
+        if (score > prev) {
+          userProfile.highScores[gameId] = Math.floor(score);
+          document.getElementById("activeGameBest").textContent = Math.floor(score).toLocaleString();
+          renderGameGrid();
+          syncProfileToCloud();
+        }
+      },
+      getSkin(gameId) {
+        const equippedId = userProfile.equippedSkins[gameId];
+        return SKINS_CATALOG.find(s => s.id === equippedId) ||
+               SKINS_CATALOG.find(s => s.game === gameId) ||
+               { color: "#06b6d4", accent: "#6366f1", name: "Default" };
+      },
+      hasPowerup(pid) {
+        return userProfile.powerups.includes(pid);
+      }
+    };
+
+    function showToast(msg) {
+      const container = document.getElementById("toastContainer");
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => { el.remove(); }, 3400);
+    }
+
+    function updateHud() {
+      document.getElementById("hudCoins").textContent = userProfile.coins.toLocaleString();
+      document.getElementById("hudGems").textContent = userProfile.gems.toLocaleString();
+    }
+
+    // =========================================================================
+    // 6. AUTHENTICATION & ADMIN ACCESS CONTROL
+    // =========================================================================
+    function checkIsAdmin(user) {
+      if (!isFirebaseConfigured) {
+        // In local preview mode before Firebase config is pasted, allow testing Admin Panel
+        return true;
+      }
+      if (!user || !user.email) return false;
+      return ADMIN_EMAILS.map(e => e.toLowerCase()).includes(user.email.toLowerCase());
+    }
+
+    function updateAuthUI() {
+      const adminBtn = document.getElementById("adminNavBtn");
+      const authBtn = document.getElementById("authNavBtn");
+      const signedOutView = document.getElementById("signedOutView");
+      const signedInView = document.getElementById("signedInView");
+      const banner = document.getElementById("firebaseStatusBanner");
+
+      if (!isFirebaseConfigured) {
+        banner.style.display = "block";
+        banner.innerHTML = "⚡ <strong>Local Demo Mode Active:</strong> Paste your Firebase keys into <code>games/index.html</code> to enable live cloud accounts & global promo codes. Admin Panel is unlocked locally for testing.";
+      } else {
+        banner.style.display = "none";
+      }
+
+      if (currentUser) {
+        authBtn.textContent = "👤 " + (currentUser.email ? currentUser.email.split("@")[0] : "Account");
+        signedOutView.style.display = "none";
+        signedInView.style.display = "block";
+        document.getElementById("userEmailDisplay").textContent = currentUser.email || currentUser.uid;
+        const isAdmin = checkIsAdmin(currentUser);
+        adminBtn.style.display = isAdmin ? "inline-flex" : "none";
+        document.getElementById("userRoleBadge").textContent = isAdmin ? "🛡️ SITE OWNER / ADMIN" : "🎮 VERIFIED PLAYER";
+      } else {
+        authBtn.textContent = "👤 Sign In";
+        signedOutView.style.display = "block";
+        signedInView.style.display = "none";
+        adminBtn.style.display = !isFirebaseConfigured ? "inline-flex" : "none";
+      }
+    }
+
+    if (auth) {
+      onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+        updateAuthUI();
+        if (user) {
+          await loadProfileFromCloud(user);
+        }
+      });
+    } else {
+      updateAuthUI();
+    }
+
+    window.emailSignIn = async () => {
+      if (!auth) return showToast("⚠️ Add your Firebase config first to use cloud accounts.");
+      const email = document.getElementById("authEmail").value.trim();
+      const pass = document.getElementById("authPassword").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        closeModal("authModal");
+        showToast("✅ Signed in!");
+      } catch (e) {
+        showToast("❌ " + e.message);
+      }
+    };
+
+    window.emailSignUp = async () => {
+      if (!auth) return showToast("⚠️ Add your Firebase config first to create cloud accounts.");
+      const email = document.getElementById("authEmail").value.trim();
+      const pass = document.getElementById("authPassword").value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+        closeModal("authModal");
+        showToast("🎉 Account created & synced!");
+      } catch (e) {
+        showToast("❌ " + e.message);
+      }
+    };
+
+    window.googleSignIn = async () => {
+      if (!auth) return showToast("⚠️ Add your Firebase config first to use Google Sign-In.");
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+        closeModal("authModal");
+        showToast("✅ Signed in with Google!");
+      } catch (e) {
+        showToast("❌ " + e.message);
+      }
+    };
+
+    window.signOutUser = async () => {
+      if (auth) await signOut(auth);
+      currentUser = null;
+      updateAuthUI();
+      closeModal("authModal");
+      showToast("Signed out.");
+    };
+
+    // =========================================================================
+    // 7. REDEEM CODE ENGINE & OWNER ADMIN DASHBOARD
+    // =========================================================================
+    window.handleRedeemCode = async () => {
+      const input = document.getElementById("redeemCodeInput");
+      const codeStr = input.value.trim().toUpperCase();
+      if (!codeStr) return showToast("Please enter a code.");
+
+      if (userProfile.redeemedCodes.includes(codeStr)) {
+        return showToast("⚠️ You already redeemed " + codeStr + "!");
+      }
+
+      let codeObj = null;
+      let fromCloud = false;
+
+      if (db && currentUser) {
+        try {
+          const snap = await getDoc(doc(db, "redeem_codes", codeStr));
+          if (snap.exists()) {
+            codeObj = snap.data();
+            fromCloud = true;
+          }
+        } catch (err) {
+          console.warn("Cloud code lookup error:", err.message);
+        }
+      }
+
+      if (!codeObj) {
+        codeObj = localCodes.find(c => c.code.toUpperCase() === codeStr);
+      }
+
+      if (!codeObj || codeObj.active === false) {
+        return showToast("❌ Invalid or expired code.");
+      }
+
+      if (codeObj.maxUses > 0 && (codeObj.usedCount || 0) >= codeObj.maxUses) {
+        return showToast("❌ This code has reached its maximum redemptions.");
+      }
+
+      // Apply Rewards
+      let rewardSummary = "";
+      if (codeObj.rewardType === "coins") {
+        const amt = Number(codeObj.amount) || 500;
+        userProfile.coins += amt;
+        rewardSummary = `+${amt.toLocaleString()} Coins`;
+      } else if (codeObj.rewardType === "gems") {
+        const amt = Number(codeObj.amount) || 25;
+        userProfile.gems += amt;
+        rewardSummary = `+${amt.toLocaleString()} Gems`;
+      } else if (codeObj.rewardType === "skin") {
+        const skin = SKINS_CATALOG.find(s => s.id === codeObj.skinId);
+        if (skin) {
+          if (!userProfile.unlockedSkins.includes(skin.id)) {
+            userProfile.unlockedSkins.push(skin.id);
+          }
+          userProfile.equippedSkins[skin.game] = skin.id;
+          rewardSummary = `Unlocked Skin: ${skin.name}`;
+        }
+      } else if (codeObj.rewardType === "all_skins") {
+        SKINS_CATALOG.forEach(s => {
+          if (!userProfile.unlockedSkins.includes(s.id)) userProfile.unlockedSkins.push(s.id);
+        });
+        rewardSummary = "Unlocked ALL Exclusive Skins!";
+      } else if (codeObj.rewardType === "powerup") {
+        const pup = POWERUPS_CATALOG.find(p => p.id === codeObj.powerupId);
+        if (pup && !userProfile.powerups.includes(pup.id)) {
+          userProfile.powerups.push(pup.id);
+        }
+        rewardSummary = `Unlocked Powerup: ${pup ? pup.name : codeObj.powerupId}`;
+      }
+
+      userProfile.redeemedCodes.push(codeStr);
+      await syncProfileToCloud();
+
+      // Increment usage counter
+      if (fromCloud && db) {
+        try {
+          await updateDoc(doc(db, "redeem_codes", codeStr), { usedCount: increment(1) });
+        } catch (e) {}
+      } else {
+        codeObj.usedCount = (codeObj.usedCount || 0) + 1;
+        saveLocalCodes();
+      }
+
+      SFX.play("powerup");
+      input.value = "";
+      closeModal("redeemModal");
+      if (activeGameId) renderActiveGameSkins();
+      showToast(`🎉 Code Redeemed! ${rewardSummary}`);
+    };
+
+    // Admin Dashboard Helpers
+    function populateAdminDropdowns() {
+      const gameSel = document.getElementById("adminTargetGame");
+      gameSel.innerHTML = `<option value="all">🌐 All Games (Global Reward)</option>` +
+        GAMES_LIST.map(g => `<option value="${g.id}">${g.icon} ${g.title}</option>`).join("");
+
+      const skinSel = document.getElementById("adminSkinSelect");
+      skinSel.innerHTML = SKINS_CATALOG.filter(s => s.price > 0).map(s => {
+        const g = GAMES_LIST.find(x => x.id === s.game);
+        return `<option value="${s.id}">[${g ? g.title : s.game}] ${s.name}</option>`;
+      }).join("");
+
+      const pupSel = document.getElementById("adminPowerupSelect");
+      pupSel.innerHTML = POWERUPS_CATALOG.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
+    }
+
+    window.updateAdminRewardInputs = () => {
+      const type = document.getElementById("adminRewardType").value;
+      document.getElementById("adminAmountGroup").style.display = (type === "coins" || type === "gems") ? "flex" : "none";
+      document.getElementById("adminSkinGroup").style.display = (type === "skin") ? "flex" : "none";
+      document.getElementById("adminPowerupGroup").style.display = (type === "powerup") ? "flex" : "none";
+      document.getElementById("adminAmountLabel").textContent = type === "gems" ? "Gem Amount" : "Coin Amount";
+    };
+
+    window.randomizeAdminCode = () => {
+      const prefixes = ["NEXUS", "APEX", "CYBER", "HYPER", "NOVA", "TURBO", "VIP"];
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+      let rand = "";
+      for (let i = 0; i < 5; i++) rand += chars[Math.floor(Math.random() * chars.length)];
+      document.getElementById("adminCodeString").value = `${prefix}-${rand}`;
+    };
+
+    window.openAdminModal = async () => {
+      if (!checkIsAdmin(currentUser)) return showToast("⛔ Admin access only.");
+      openModal("adminModal");
+      await renderAdminCodesTable();
+    };
+
+    window.createAdminCode = async () => {
+      if (!checkIsAdmin(currentUser)) return showToast("⛔ Admin access only.");
+      let codeStr = document.getElementById("adminCodeString").value.trim().toUpperCase();
+      if (!codeStr) {
+        randomizeAdminCode();
+        codeStr = document.getElementById("adminCodeString").value.trim().toUpperCase();
+      }
+      const game = document.getElementById("adminTargetGame").value;
+      const rewardType = document.getElementById("adminRewardType").value;
+      const amount = parseInt(document.getElementById("adminRewardAmount").value, 10) || 1000;
+      const skinId = document.getElementById("adminSkinSelect").value;
+      const powerupId = document.getElementById("adminPowerupSelect").value;
+      const maxUses = parseInt(document.getElementById("adminMaxUses").value, 10) || 0;
+      const note = document.getElementById("adminCodeNote").value.trim();
+
+      const newCode = {
+        code: codeStr,
+        game,
+        rewardType,
+        amount,
+        skinId,
+        powerupId,
+        maxUses,
+        usedCount: 0,
+        active: true,
+        note,
+        createdAt: Date.now()
+      };
+
+      if (db && currentUser) {
+        try {
+          await setDoc(doc(db, "redeem_codes", codeStr), newCode);
+        } catch (err) {
+          showToast("⚠️ Cloud error (saved locally): " + err.message);
+        }
+      }
+
+      const idx = localCodes.findIndex(c => c.code === codeStr);
+      if (idx >= 0) localCodes[idx] = newCode;
+      else localCodes.unshift(newCode);
+      saveLocalCodes();
+
+      SFX.play("coin");
+      document.getElementById("adminCodeString").value = "";
+      showToast(`✅ Created live code: ${codeStr}`);
+      await renderAdminCodesTable();
+    };
+
+    window.deleteAdminCode = async (codeStr) => {
+      if (!checkIsAdmin(currentUser)) return;
+      if (db && currentUser) {
+        try { await deleteDoc(doc(db, "redeem_codes", codeStr)); } catch (e) {}
+      }
+      localCodes = localCodes.filter(c => c.code !== codeStr);
+      saveLocalCodes();
+      showToast(`🗑️ Deleted code ${codeStr}`);
+      await renderAdminCodesTable();
+    };
+
+    window.copyCodeText = (codeStr) => {
+      navigator.clipboard.writeText(codeStr);
+      showToast(`📋 Copied ${codeStr}`);
+    };
+
+    async function renderAdminCodesTable() {
+      let codes = [...localCodes];
+      if (db && currentUser) {
+        try {
+          const snap = await getDocs(collection(db, "redeem_codes"));
+          const cloudCodes = [];
+          snap.forEach(d => cloudCodes.push(d.data()));
+          if (cloudCodes.length > 0) codes = cloudCodes;
+        } catch (e) {}
+      }
+
+      document.getElementById("adminCodesCount").textContent = `${codes.length} code(s)`;
+      const tbody = document.getElementById("adminCodesTableBody");
+      tbody.innerHTML = codes.map(c => {
+        let rewardText = "";
+        if (c.rewardType === "coins") rewardText = `🪙 ${Number(c.amount).toLocaleString()} Coins`;
+        else if (c.rewardType === "gems") rewardText = `💎 ${Number(c.amount).toLocaleString()} Gems`;
+        else if (c.rewardType === "all_skins") rewardText = `👑 ALL Skins`;
+        else if (c.rewardType === "skin") {
+          const sk = SKINS_CATALOG.find(s => s.id === c.skinId);
+          rewardText = `🎨 ${sk ? sk.name : c.skinId}`;
+        } else if (c.rewardType === "powerup") {
+          const pu = POWERUPS_CATALOG.find(p => p.id === c.powerupId);
+          rewardText = `⚡ ${pu ? pu.name : c.powerupId}`;
+        }
+
+        const gObj = GAMES_LIST.find(g => g.id === c.game);
+        const gameLabel = c.game === "all" ? "All Games" : (gObj ? gObj.title : c.game);
+        const usesLabel = c.maxUses > 0 ? `${c.usedCount || 0} / ${c.maxUses}` : `${c.usedCount || 0} / ∞`;
+
+        return `
+          <tr>
+            <td>
+              <span class="code-badge">${c.code}</span>
+              ${c.note ? `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:3px;">${c.note}</div>` : ""}
+            </td>
+            <td>${gameLabel}</td>
+            <td>${rewardText}</td>
+            <td style="font-family:var(--font-mono);">${usesLabel}</td>
+            <td>
+              <button class="btn btn-ghost" style="padding:0.3rem 0.6rem; font-size:0.76rem;" onclick="copyCodeText('${c.code}')">Copy</button>
+              <button class="btn btn-admin" style="padding:0.3rem 0.6rem; font-size:0.76rem;" onclick="deleteAdminCode('${c.code}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // =========================================================================
+    // 8. LOCKER (BUY OR EQUIP SKINS & POWERUPS)
+    // =========================================================================
+    function renderLocker() {
+      const pGrid = document.getElementById("lockerPowerupsGrid");
+      pGrid.innerHTML = POWERUPS_CATALOG.map(p => {
+        const owned = userProfile.powerups.includes(p.id);
+        return `
+          <div style="background:var(--bg-void); border:1px solid ${owned ? 'var(--accent-emerald)' : 'var(--border-subtle)'}; border-radius:12px; padding:0.9rem; display:flex; flex-direction:column; gap:0.45rem;">
+            <div style="font-weight:800; color:#fff;">⚡ ${p.name}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); flex:1;">${p.desc}</div>
+            ${owned
+              ? `<div style="color:var(--accent-emerald); font-weight:700; font-size:0.82rem;">✓ ACTIVE</div>`
+              : `<button class="btn btn-primary" style="justify-content:center; padding:0.45rem; font-size:0.82rem;" onclick="buyPowerup('${p.id}')">🪙 ${p.price.toLocaleString()}</button>`
+            }
+          </div>
+        `;
+      }).join("");
+
+      const sGrid = document.getElementById("lockerSkinsGrid");
+      sGrid.innerHTML = SKINS_CATALOG.filter(s => s.price > 0).map(s => {
+        const owned = userProfile.unlockedSkins.includes(s.id);
+        const equipped = userProfile.equippedSkins[s.game] === s.id;
+        const g = GAMES_LIST.find(x => x.id === s.game);
+        return `
+          <div style="background:var(--bg-void); border:1px solid ${equipped ? 'var(--accent-cyan)' : 'var(--border-subtle)'}; border-radius:12px; padding:0.9rem; display:flex; flex-direction:column; gap:0.45rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${g ? g.title : s.game}</span>
+              <span style="width:14px; height:14px; border-radius:50%; background:${s.color}; box-shadow:0 0 8px ${s.color};"></span>
+            </div>
+            <div style="font-weight:800;">${s.name}</div>
+            ${owned
+              ? `<button class="btn ${equipped ? 'btn-ghost' : 'btn-primary'}" style="justify-content:center; padding:0.42rem; font-size:0.8rem;" onclick="equipSkin('${s.game}','${s.id}')">${equipped ? '✓ Equipped' : 'Equip Skin'}</button>`
+              : `<button class="btn btn-redeem" style="justify-content:center; padding:0.42rem; font-size:0.8rem;" onclick="buySkin('${s.id}')">🪙 ${s.price.toLocaleString()}</button>`
+            }
+          </div>
+        `;
+      }).join("");
+    }
+
+    window.buyPowerup = async (pid) => {
+      const p = POWERUPS_CATALOG.find(x => x.id === pid);
+      if (!p || userProfile.powerups.includes(pid)) return;
+      if (userProfile.coins < p.price) return showToast("❌ Not enough Coins! Play games or redeem a code.");
+      userProfile.coins -= p.price;
+      userProfile.powerups.push(pid);
+      SFX.play("powerup");
+      await syncProfileToCloud();
+      renderLocker();
+      showToast(`⚡ Unlocked ${p.name}!`);
+    };
+
+    window.buySkin = async (sid) => {
+      const s = SKINS_CATALOG.find(x => x.id === sid);
+      if (!s || userProfile.unlockedSkins.includes(sid)) return;
+      if (userProfile.coins < s.price) return showToast("❌ Not enough Coins! Play games or redeem a code.");
+      userProfile.coins -= s.price;
+      userProfile.unlockedSkins.push(sid);
+      userProfile.equippedSkins[s.game] = sid;
+      SFX.play("powerup");
+      await syncProfileToCloud();
+      renderLocker();
+      showToast(`🎨 Unlocked & Equipped ${s.name}!`);
+    };
+
+    window.equipSkin = async (gameId, skinId) => {
+      if (!userProfile.unlockedSkins.includes(skinId)) {
+        return showToast("🔒 Unlock this skin in the Locker or with a Redeem Code!");
+      }
+      userProfile.equippedSkins[gameId] = skinId;
+      SFX.play("click");
+      await syncProfileToCloud();
+      renderLocker();
+      if (activeGameId === gameId) renderActiveGameSkins();
+      showToast("✨ Skin equipped!");
+    };
+
+    // =========================================================================
+    // 9. MODAL & GRID NAVIGATION
+    // =========================================================================
+    window.openModal = (id) => {
+      if (id === "lockerModal") renderLocker();
+      document.getElementById(id).classList.add("open");
+    };
+
+    window.closeModal = (id) => {
+      document.getElementById(id).classList.remove("open");
+    };
+
+    window.closeAllModals = () => {
+      closeGameModal();
+      ["redeemModal", "lockerModal", "authModal", "adminModal"].forEach(closeModal);
+    };
+
+    window.closeGameModal = () => {
+      if (activeGameCleanup) {
+        try { activeGameCleanup(); } catch (e) {}
+        activeGameCleanup = null;
+      }
+      activeGameId = null;
+      document.getElementById("gameStage").innerHTML = "";
+      closeModal("gameModal");
+    };
+
+    // Prevent arrow/space page scrolling when playing a game
+    window.addEventListener("keydown", (e) => {
+      if (activeGameId && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", " "].includes(e.key)) {
+        if (document.activeElement.tagName !== "INPUT") {
+          e.preventDefault();
+        }
+      }
+    }, { passive: false });
+
+    document.querySelectorAll(".cat-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".cat-tab").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeCategory = btn.dataset.cat;
+        renderGameGrid();
+      });
+    });
+
+    window.renderGameGrid = () => {
+      const q = document.getElementById("gameSearchInput").value.trim().toLowerCase();
+      const filtered = GAMES_LIST.filter(g => {
+        const matchCat = activeCategory === "all" || g.cat === activeCategory;
+        const matchQ = !q || g.title.toLowerCase().includes(q) || g.desc.toLowerCase().includes(q);
+        return matchCat && matchQ;
+      });
+
+      const grid = document.getElementById("gameGrid");
+      grid.innerHTML = filtered.map(g => {
+        const best = userProfile.highScores[g.id] || 0;
+        return `
+          <div class="game-card" onclick="launchGame('${g.id}')">
+            <div class="card-banner" style="background:${g.bg};">
+              <span>${g.icon}</span>
+              <span class="card-badge">${g.cat}</span>
+            </div>
+            <div class="card-body">
+              <div class="card-title">${g.title}</div>
+              <div class="card-desc">${g.desc}</div>
+              <div class="card-footer">
+                <span class="best-score">BEST: ${best.toLocaleString()}</span>
+                <span class="play-pill">PLAY ▶</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    };
+
+    function renderActiveGameSkins() {
+      const strip = document.getElementById("activeGameSkins");
+      const skins = SKINS_CATALOG.filter(s => s.game === activeGameId);
+      if (skins.length === 0) {
+        strip.innerHTML = `<span style="font-size:0.78rem; color:var(--text-muted);">Global Powerups Active</span>`;
+        return;
+      }
+      strip.innerHTML = skins.map(s => {
+        const owned = userProfile.unlockedSkins.includes(s.id);
+        const equipped = userProfile.equippedSkins[activeGameId] === s.id;
+        return `
+          <button class="skin-chip ${equipped ? 'equipped' : ''} ${!owned ? 'locked' : ''}"
+            onclick="equipSkin('${activeGameId}','${s.id}')">
+            ${owned ? '' : '🔒 '}${s.name}
+          </button>
+        `;
+      }).join("");
+    }
+
+    window.launchGame = (gameId) => {
+      if (activeGameCleanup) {
+        try { activeGameCleanup(); } catch (e) {}
+        activeGameCleanup = null;
+      }
+      activeGameId = gameId;
+      const meta = GAMES_LIST.find(g => g.id === gameId);
+      document.getElementById("activeGameIcon").textContent = meta.icon;
+      document.getElementById("activeGameTitle").textContent = meta.title;
+      document.getElementById("activeGameBest").textContent = (userProfile.highScores[gameId] || 0).toLocaleString();
+      renderActiveGameSkins();
+
+      const stage = document.getElementById("gameStage");
+      stage.innerHTML = "";
+      document.getElementById("gameModal").classList.add("open");
+
+      const launcher = GAME_ENGINES[gameId];
+      if (launcher) {
+        activeGameCleanup = launcher(stage, document.getElementById("activeGameControlsHint"));
+      }
+    };
+
+    window.restartActiveGame = () => {
+      if (activeGameId) launchGame(activeGameId);
+    };
+
+    // =========================================================================
+    // 10. ALL 18 FULL GAME ENGINES (HIGH-QUALITY 60FPS CANVAS & INTERACTIVE)
+    // =========================================================================
+    const GAME_ENGINES = {
+
+      // 1. COOKIE EMPIRE (COOKIE CLICKER)
+      cookie(stage, hint) {
+        hint.textContent = "Click the glowing cookie to bake! Buy buildings & catch Golden Cookies for massive multipliers.";
+        let state = JSON.parse(localStorage.getItem("nexus_cookie_save") || "null") || {
+          cookies: 0, total: 0, clickPower: 1,
+          buildings: [
+            { name: "Auto Cursor", icon: "👆", base: 15, cps: 0.5, count: 0 },
+            { name: "Cyber Grandma", icon: "👵", base: 100, cps: 4, count: 0 },
+            { name: "Plasma Bakery", icon: "🏭", base: 650, cps: 22, count: 0 },
+            { name: "Quantum Oven", icon: "⚛️", base: 4000, cps: 110, count: 0 },
+            { name: "Time Portal", icon: "🌀", base: 25000, cps: 640, count: 0 },
+            { name: "Cosmic Kitchen", icon: "🌌", base: 150000, cps: 3600, count: 0 }
+          ]
+        };
+        const mult = GameAPI.hasPowerup("cookie_2x") ? 2 : 1;
+
+        stage.innerHTML = `
+          <div style="display:grid; grid-template-columns:1fr 1.15fr; gap:1.25rem; width:100%; max-width:900px; align-items:center;">
+            <div style="text-align:center; position:relative; padding:1rem;">
+              <div id="ckCount" style="font-size:2rem; font-weight:900; font-family:var(--font-mono); color:#fbbf24;">0</div>
+              <div id="ckCps" style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.25rem;">0 cookies / sec</div>
+              <button id="bigCookieBtn" style="width:190px; height:190px; border-radius:50%; border:4px solid #fbbf24; font-size:5.5rem; cursor:pointer; transition:transform 0.08s; box-shadow:0 0 45px rgba(251,191,36,0.4); background:radial-gradient(circle at 30% 30%, #f59e0b, #78350f);">🍪</button>
+              <div id="ckFloatLayer" style="position:absolute; inset:0; pointer-events:none;"></div>
+            </div>
+            <div id="ckShop" style="display:flex; flex-direction:column; gap:0.55rem; max-height:390px; overflow-y:auto; padding-right:0.35rem;"></div>
+          </div>
+        `;
+
+        const cookieBtn = stage.querySelector("#bigCookieBtn");
+        function applySkin() {
+          const sk = GameAPI.getSkin("cookie");
+          cookieBtn.style.borderColor = sk.color;
+          cookieBtn.style.background = `radial-gradient(circle at 30% 30%, ${sk.color}, ${sk.accent})`;
+          cookieBtn.style.boxShadow = `0 0 45px ${sk.color}88`;
+        }
+        applySkin();
+
+        function getCps() {
+          return state.buildings.reduce((acc, b) => acc + b.count * b.cps, 0) * mult;
+        }
+
+        function renderShop() {
+          const shop = stage.querySelector("#ckShop");
+          shop.innerHTML = state.buildings.map((b, idx) => {
+            const cost = Math.floor(b.base * Math.pow(1.15, b.count));
+            const canBuy = state.cookies >= cost;
+            return `
+              <button onclick="window._buyCkBuilding(${idx})" style="display:flex; justify-content:space-between; align-items:center; background:${canBuy ? '#18223c' : '#0b101d'}; border:1px solid ${canBuy ? '#6366f1' : 'rgba(148,163,184,0.12)'}; padding:0.7rem 0.9rem; border-radius:12px; color:#fff; cursor:pointer; text-align:left;">
+                <div>
+                  <div style="font-weight:800; font-size:0.95rem;">${b.icon} ${b.name} <span style="color:var(--accent-cyan);">x${b.count}</span></div>
+                  <div style="font-size:0.76rem; color:var(--text-muted);">+${(b.cps * mult).toFixed(1)} CPS</div>
+                </div>
+                <div style="font-family:var(--font-mono); font-weight:700; color:${canBuy ? '#fbbf24' : '#64748b'};">🍪 ${cost.toLocaleString()}</div>
+              </button>
+            `;
+          }).join("");
+        }
+
+        window._buyCkBuilding = (idx) => {
+          const b = state.buildings[idx];
+          const cost = Math.floor(b.base * Math.pow(1.15, b.count));
+          if (state.cookies < cost) return;
+          state.cookies -= cost;
+          b.count++;
+          SFX.play("powerup");
+          renderShop();
+          updateUI();
+        };
+
+        function updateUI() {
+          applySkin();
+          stage.querySelector("#ckCount").textContent = Math.floor(state.cookies).toLocaleString() + " Cookies";
+          stage.querySelector("#ckCps").textContent = `${getCps().toFixed(1)} cookies / sec ${mult > 1 ? '(2X BOOST)' : ''}`;
+          GameAPI.submitScore("cookie", Math.floor(state.total));
+        }
+
+        cookieBtn.addEventListener("click", () => {
+          const gain = (1 + state.buildings[0].count * 0.5) * mult;
+          state.cookies += gain;
+          state.total += gain;
+          SFX.play("coin");
+          cookieBtn.style.transform = "scale(0.92)";
+          setTimeout(() => cookieBtn.style.transform = "scale(1)", 70);
+          if (Math.random() < 0.08) GameAPI.addCoins(2);
+          updateUI();
+          renderShop();
+        });
+
+        renderShop();
+        updateUI();
+
+        const interval = setInterval(() => {
+          const cps = getCps();
+          if (cps > 0) {
+            state.cookies += cps / 10;
+            state.total += cps / 10;
+            updateUI();
+            renderShop();
+          }
+          localStorage.setItem("nexus_cookie_save", JSON.stringify(state));
+        }, 100);
+
+        return () => {
+          clearInterval(interval);
+          localStorage.setItem("nexus_cookie_save", JSON.stringify(state));
+        };
+      },
+
+      // 2. NEON DRIFT (TOP-DOWN HIGHWAY CAR RACER)
+      drift(stage, hint) {
+        hint.textContent = "Use LEFT / RIGHT Arrows (or A / D) to steer, UP / SPACE for Nitro Boost. Collect coins & dodge traffic!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 480; canvas.height = 500; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let carX = 240, speed = 5.5, score = 0, coinsRun = 0, nitro = 100, alive = true;
+        let shield = GameAPI.hasPowerup("shield_start");
+        const infNitro = GameAPI.hasPowerup("nitro_max");
+        const keys = {};
+        const traffic = [];
+        const pickups = [];
+        const particles = [];
+        let roadOffset = 0, frame = 0, raf;
+
+        const onDown = e => keys[e.key] = true;
+        const onUp = e => keys[e.key] = false;
+        window.addEventListener("keydown", onDown);
+        window.addEventListener("keyup", onUp);
+
+        function loop() {
+          if (!alive) return;
+          frame++;
+          const sk = GameAPI.getSkin("drift");
+          const boosting = (keys[" "] || keys["ArrowUp"] || keys["w"]) && (nitro > 5 || infNitro);
+          if (boosting && !infNitro) nitro = Math.max(0, nitro - 0.8);
+          else nitro = Math.min(100, nitro + 0.25);
+
+          const curSpeed = speed + (boosting ? 4.5 : 0);
+          speed = Math.min(13, 5.5 + score * 0.002);
+          score += curSpeed * 0.25;
+          roadOffset = (roadOffset + curSpeed * 2.2) % 40;
+
+          if (keys["ArrowLeft"] || keys["a"]) carX -= 6.2;
+          if (keys["ArrowRight"] || keys["d"]) carX += 6.2;
+          carX = Math.max(85, Math.min(395, carX));
+
+          if (frame % Math.max(22, Math.floor(55 - speed * 2.5)) === 0) {
+            const lane = 95 + Math.floor(Math.random() * 4) * 95;
+            const colors = ["#64748b", "#3b82f6", "#ec4899", "#10b981"];
+            traffic.push({ x: lane, y: -60, w: 38, h: 64, color: colors[Math.floor(Math.random() * colors.length)] });
+          }
+          if (frame % 48 === 0) {
+            pickups.push({ x: 95 + Math.floor(Math.random() * 4) * 95, y: -30 });
+          }
+
+          // Background & Road
+          ctx.fillStyle = "#060913"; ctx.fillRect(0, 0, 480, 500);
+          ctx.fillStyle = "#111827"; ctx.fillRect(60, 0, 360, 500);
+          ctx.strokeStyle = sk.color; ctx.lineWidth = 4;
+          ctx.strokeRect(60, -5, 360, 510);
+
+          ctx.strokeStyle = "rgba(255,255,255,0.22)"; ctx.lineWidth = 2;
+          ctx.setLineDash([22, 18]); ctx.lineDashOffset = -roadOffset;
+          [150, 240, 330].forEach(lx => {
+            ctx.beginPath(); ctx.moveTo(lx, 0); ctx.lineTo(lx, 500); ctx.stroke();
+          });
+          ctx.setLineDash([]);
+
+          // Nitro flame particles
+          if (boosting) {
+            particles.push({ x: carX + (Math.random() - 0.5) * 14, y: 432, vy: 5, life: 14 });
+          }
+          for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.y += p.vy; p.life--;
+            ctx.fillStyle = `rgba(6,182,212,${p.life / 14})`;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.fill();
+            if (p.life <= 0) particles.splice(i, 1);
+          }
+
+          // Pickups
+          for (let i = pickups.length - 1; i >= 0; i--) {
+            const c = pickups[i];
+            c.y += curSpeed * 1.4;
+            ctx.fillStyle = "#fbbf24";
+            ctx.beginPath(); ctx.arc(c.x, c.y, 11, 0, Math.PI * 2); ctx.fill();
+            if (Math.abs(c.x - carX) < 30 && Math.abs(c.y - 400) < 42) {
+              coinsRun += GameAPI.addCoins(5);
+              SFX.play("coin");
+              pickups.splice(i, 1);
+            } else if (c.y > 530) pickups.splice(i, 1);
+          }
+
+          // Traffic
+          for (let i = traffic.length - 1; i >= 0; i--) {
+            const t = traffic[i];
+            t.y += curSpeed * 1.15;
+            ctx.fillStyle = t.color;
+            ctx.beginPath(); ctx.roundRect(t.x - 19, t.y - 32, 38, 64, 8); ctx.fill();
+            ctx.fillStyle = "#0f172a"; ctx.fillRect(t.x - 14, t.y - 12, 28, 20);
+
+            if (Math.abs(t.x - carX) < 32 && Math.abs(t.y - 400) < 56) {
+              if (shield) {
+                shield = false;
+                traffic.splice(i, 1);
+                SFX.play("hit");
+                showToast("🛡️ Shield absorbed crash!");
+                continue;
+              }
+              alive = false;
+              SFX.play("gameover");
+              GameAPI.submitScore("drift", Math.floor(score));
+              ctx.fillStyle = "rgba(3,5,12,0.82)"; ctx.fillRect(0, 0, 480, 500);
+              ctx.fillStyle = "#fff"; ctx.font = "900 30px Outfit"; ctx.textAlign = "center";
+              ctx.fillText("CRASHED!", 240, 215);
+              ctx.font = "700 18px JetBrains Mono"; ctx.fillStyle = "#06b6d4";
+              ctx.fillText(`DISTANCE: ${Math.floor(score)}m  |  +${coinsRun} COINS`, 240, 255);
+              ctx.font = "600 14px Outfit"; ctx.fillStyle = "#94a3b8";
+              ctx.fillText("Click Restart above to race again", 240, 295);
+              return;
+            }
+            if (t.y > 550) traffic.splice(i, 1);
+          }
+
+          // Player Car
+          ctx.save();
+          ctx.shadowColor = sk.color; ctx.shadowBlur = 18;
+          ctx.fillStyle = sk.color;
+          ctx.beginPath(); ctx.roundRect(carX - 20, 368, 40, 66, 9); ctx.fill();
+          ctx.fillStyle = "#090d16"; ctx.fillRect(carX - 15, 384, 30, 18);
+          ctx.fillStyle = sk.accent; ctx.fillRect(carX - 16, 370, 8, 4); ctx.fillRect(carX + 8, 370, 8, 4);
+          if (shield) {
+            ctx.strokeStyle = "#38bdf8"; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(carX, 401, 42, 0, Math.PI * 2); ctx.stroke();
+          }
+          ctx.restore();
+
+          // HUD
+          ctx.fillStyle = "#fff"; ctx.font = "700 15px JetBrains Mono"; ctx.textAlign = "left";
+          ctx.fillText(`DIST: ${Math.floor(score)}m`, 16, 28);
+          ctx.fillStyle = "#fbbf24"; ctx.fillText(`COINS: +${coinsRun}`, 16, 50);
+          ctx.fillStyle = "#1e293b"; ctx.fillRect(340, 16, 120, 12);
+          ctx.fillStyle = infNitro ? "#a855f7" : "#06b6d4"; ctx.fillRect(340, 16, 1.2 * nitro, 12);
+
+          raf = requestAnimationFrame(loop);
+        }
+        raf = requestAnimationFrame(loop);
+        return () => {
+          cancelAnimationFrame(raf);
+          window.removeEventListener("keydown", onDown);
+          window.removeEventListener("keyup", onUp);
+        };
+      },
+
+      // 3. CYBER RALLY 3D (PSEUDO-3D HORIZON RACER)
+      rally(stage, hint) {
+        hint.textContent = "LEFT / RIGHT Arrows to steer around corners, UP Arrow to accelerate. Beat the clock & pass rivals!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 640; canvas.height = 440; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let pos = 0, playerX = 0, speed = 0, score = 0, curve = 0, targetCurve = 0, frame = 0, alive = true, raf;
+        const rivals = Array.from({ length: 6 }, (_, i) => ({ z: 400 + i * 350, x: (Math.random() - 0.5) * 1.3 }));
+        const keys = {};
+        const onDown = e => keys[e.key] = true;
+        const onUp = e => keys[e.key] = false;
+        window.addEventListener("keydown", onDown);
+        window.addEventListener("keyup", onUp);
+
+        function loop() {
+          if (!alive) return;
+          frame++;
+          const sk = GameAPI.getSkin("rally");
+          const maxSpd = GameAPI.hasPowerup("nitro_max") ? 26 : 21;
+          if (keys["ArrowUp"] || keys["w"]) speed = Math.min(maxSpd, speed + 0.35);
+          else speed = Math.max(6, speed - 0.15);
+
+          if (frame % 180 === 0) targetCurve = (Math.random() - 0.5) * 2.4;
+          curve += (targetCurve - curve) * 0.02;
+
+          if (keys["ArrowLeft"] || keys["a"]) playerX -= 0.035;
+          if (keys["ArrowRight"] || keys["d"]) playerX += 0.035;
+          playerX -= curve * (speed / maxSpd) * 0.018;
+          playerX = Math.max(-1.45, Math.min(1.45, playerX));
+
+          pos += speed;
+          score += speed * 0.15;
+          if (frame % 90 === 0) GameAPI.addCoins(3);
+
+          // Sky
+          const grad = ctx.createLinearGradient(0, 0, 0, 220);
+          grad.addColorStop(0, "#050714"); grad.addColorStop(1, "#1e1b4b");
+          ctx.fillStyle = grad; ctx.fillRect(0, 0, 640, 220);
+
+          // Sun
+          ctx.fillStyle = "#f43f5e";
+          ctx.beginPath(); ctx.arc(320 - curve * 45, 165, 52, 0, Math.PI * 2); ctx.fill();
+
+          // Pseudo-3D Road Scanlines
+          for (let y = 220; y < 440; y++) {
+            const p = (y - 220) / 220;
+            const z = 1 / (p + 0.05);
+            const stripe = Math.floor((z * 18 + pos * 0.25)) % 2 === 0;
+            const roadW = 45 + p * 270;
+            const centerX = 320 - playerX * p * 190 + curve * Math.pow(1 - p, 2) * 140;
+
+            ctx.fillStyle = stripe ? "#090d1a" : "#0d1326";
+            ctx.fillRect(0, y, 640, 1);
+
+            ctx.fillStyle = stripe ? sk.color : "#e2e8f0";
+            ctx.fillRect(centerX - roadW - 10 * p, y, roadW * 2 + 20 * p, 1);
+
+            ctx.fillStyle = stripe ? "#1e293b" : "#172033";
+            ctx.fillRect(centerX - roadW, y, roadW * 2, 1);
+
+            if (stripe) {
+              ctx.fillStyle = "rgba(255,255,255,0.45)";
+              ctx.fillRect(centerX - 3 * p, y, 6 * p, 1);
+            }
+          }
+
+          // Rivals
+          rivals.forEach(r => {
+            r.z -= speed * 0.65;
+            if (r.z < 20) {
+              r.z = 2100;
+              r.x = (Math.random() - 0.5) * 1.25;
+            }
+            const p = Math.max(0.05, Math.min(1, 220 / r.z));
+            const ry = 220 + p * 200;
+            const rx = 320 + (r.x - playerX) * p * 190 + curve * Math.pow(1 - p, 2) * 140;
+            const rw = 58 * p, rh = 34 * p;
+            ctx.fillStyle = "#f43f5e";
+            ctx.fillRect(rx - rw / 2, ry - rh, rw, rh);
+
+            if (p > 0.86 && Math.abs(r.x - playerX) < 0.28) {
+              alive = false;
+              SFX.play("gameover");
+              GameAPI.submitScore("rally", Math.floor(score));
+              ctx.fillStyle = "rgba(4,6,14,0.82)"; ctx.fillRect(0, 0, 640, 440);
+              ctx.fillStyle = "#fff"; ctx.font = "900 30px Outfit"; ctx.textAlign = "center";
+              ctx.fillText("COLLISION!", 320, 200);
+              ctx.font = "700 18px JetBrains Mono"; ctx.fillStyle = "#06b6d4";
+              ctx.fillText(`SCORE: ${Math.floor(score)}`, 320, 240);
+            }
+          });
+
+          // Player Car
+          ctx.save();
+          ctx.shadowColor = sk.color; ctx.shadowBlur = 16;
+          ctx.fillStyle = sk.color;
+          ctx.beginPath(); ctx.roundRect(275, 375, 90, 44, 10); ctx.fill();
+          ctx.fillStyle = "#090d16"; ctx.fillRect(288, 381, 64, 14);
+          ctx.fillStyle = "#ef4444"; ctx.fillRect(280, 405, 18, 6); ctx.fillRect(342, 405, 18, 6);
+          ctx.restore();
+
+          ctx.fillStyle = "#fff"; ctx.font = "700 15px JetBrains Mono"; ctx.textAlign = "left";
+          ctx.fillText(`SCORE: ${Math.floor(score)}  |  SPEED: ${Math.floor(speed * 14)} KM/H`, 18, 28);
+
+          if (alive) raf = requestAnimationFrame(loop);
+        }
+        raf = requestAnimationFrame(loop);
+        return () => {
+          cancelAnimationFrame(raf);
+          window.removeEventListener("keydown", onDown);
+          window.removeEventListener("keyup", onUp);
+        };
+      },
+
+      // 4. NEON SNAKE
+      snake(stage, hint) {
+        hint.textContent = "Use Arrow Keys or WASD to guide the serpent. Eat energy orbs to grow & earn coins!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 460; canvas.height = 460; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        const grid = 20, cells = 23;
+        let snake = [{ x: 11, y: 11 }, { x: 10, y: 11 }, { x: 9, y: 11 }];
+        let dir = { x: 1, y: 0 }, nextDir = { x: 1, y: 0 };
+        let food = { x: 16, y: 11 }, score = 0, alive = true;
+
+        const onKey = e => {
+          if ((e.key === "ArrowUp" || e.key === "w") && dir.y === 0) nextDir = { x: 0, y: -1 };
+          if ((e.key === "ArrowDown" || e.key === "s") && dir.y === 0) nextDir = { x: 0, y: 1 };
+          if ((e.key === "ArrowLeft" || e.key === "a") && dir.x === 0) nextDir = { x: -1, y: 0 };
+          if ((e.key === "ArrowRight" || e.key === "d") && dir.x === 0) nextDir = { x: 1, y: 0 };
+        };
+        window.addEventListener("keydown", onKey);
+
+        const timer = setInterval(() => {
+          if (!alive) return;
+          dir = nextDir;
+          const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+          if (head.x < 0 || head.x >= cells || head.y < 0 || head.y >= cells ||
+              snake.some(s => s.x === head.x && s.y === head.y)) {
+            alive = false;
+            SFX.play("gameover");
+            GameAPI.submitScore("snake", score);
+            ctx.fillStyle = "rgba(4,6,14,0.82)"; ctx.fillRect(0, 0, 460, 460);
+            ctx.fillStyle = "#fff"; ctx.font = "900 28px Outfit"; ctx.textAlign = "center";
+            ctx.fillText("GAME OVER", 230, 215);
+            ctx.font = "700 18px JetBrains Mono"; ctx.fillStyle = "#10b981";
+            ctx.fillText(`FINAL SCORE: ${score}`, 230, 250);
+            return;
+          }
+          snake.unshift(head);
+          if (head.x === food.x && head.y === food.y) {
+            score += 10;
+            GameAPI.addCoins(4);
+            SFX.play("coin");
+            food = { x: Math.floor(Math.random() * cells), y: Math.floor(Math.random() * cells) };
+          } else {
+            snake.pop();
+          }
+
+          const sk = GameAPI.getSkin("snake");
+          ctx.fillStyle = "#050811"; ctx.fillRect(0, 0, 460, 460);
+          ctx.strokeStyle = "rgba(148,163,184,0.06)";
+          for (let i = 0; i <= cells; i++) {
+            ctx.beginPath(); ctx.moveTo(i * grid, 0); ctx.lineTo(i * grid, 460); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, i * grid); ctx.lineTo(460, i * grid); ctx.stroke();
+          }
+
+          ctx.fillStyle = "#f43f5e";
+          ctx.beginPath(); ctx.arc(food.x * grid + 10, food.y * grid + 10, 8, 0, Math.PI * 2); ctx.fill();
+
+          snake.forEach((s, idx) => {
+            ctx.fillStyle = idx === 0 ? sk.accent : sk.color;
+            ctx.beginPath(); ctx.roundRect(s.x * grid + 1, s.y * grid + 1, grid - 2, grid - 2, 5); ctx.fill();
+          });
+
+          ctx.fillStyle = "#fff"; ctx.font = "700 14px JetBrains Mono"; ctx.textAlign = "left";
+          ctx.fillText(`SCORE: ${score}`, 14, 24);
+        }, 95);
+
+        return () => { clearInterval(timer); window.removeEventListener("keydown", onKey); };
+      },
+
+      // 5. BLOCK MATRIX (TETRIS)
+      tetris(stage, hint) {
+        hint.textContent = "LEFT / RIGHT to move, UP to rotate, DOWN for soft drop, SPACE for instant hard drop.";
+        const canvas = document.createElement("canvas");
+        canvas.width = 300; canvas.height = 480; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        const COLS = 10, ROWS = 20, SZ = 24;
+        const board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+        const SHAPES = [
+          [[1,1,1,1]],
+          [[1,1],[1,1]],
+          [[0,1,0],[1,1,1]],
+          [[1,0,0],[1,1,1]],
+          [[0,0,1],[1,1,1]],
+          [[0,1,1],[1,1,0]],
+          [[1,1,0],[0,1,1]]
+        ];
+        const COLORS = ["", "#06b6d4", "#fbbf24", "#a855f7", "#3b82f6", "#f97316", "#10b981", "#f43f5e"];
+        let score = 0, alive = true;
+
+        function spawn() {
+          const id = 1 + Math.floor(Math.random() * SHAPES.length);
+          return { m: SHAPES[id - 1].map(r => [...r]), id, x: 3, y: 0 };
+        }
+        let cur = spawn();
+
+        function collide(m, ox, oy) {
+          for (let r = 0; r < m.length; r++)
+            for (let c = 0; c < m[r].length; c++)
+              if (m[r][c]) {
+                const nx = ox + c, ny = oy + r;
+                if (nx < 0 || nx >= COLS || ny >= ROWS || (ny >= 0 && board[ny][nx])) return true;
+              }
+          return false;
+        }
+
+        function merge() {
+          cur.m.forEach((row, r) => row.forEach((v, c) => {
+            if (v && cur.y + r >= 0) board[cur.y + r][cur.x + c] = cur.id;
+          }));
+          let cleared = 0;
+          for (let r = ROWS - 1; r >= 0; r--) {
+            if (board[r].every(v => v !== 0)) {
+              board.splice(r, 1);
+              board.unshift(Array(COLS).fill(0));
+              cleared++; r++;
+            }
+          }
+          if (cleared > 0) {
+            score += cleared * 100 * cleared;
+            GameAPI.addCoins(cleared * 8);
+            SFX.play("powerup");
+          }
+          cur = spawn();
+          if (collide(cur.m, cur.x, cur.y)) {
+            alive = false;
+            SFX.play("gameover");
+            GameAPI.submitScore("tetris", score);
+          }
+        }
+
+        function rotate(m) {
+          return m[0].map((_, i) => m.map(row => row[i]).reverse());
+        }
+
+        const onKey = e => {
+          if (!alive) return;
+          if (e.key === "ArrowLeft" && !collide(cur.m, cur.x - 1, cur.y)) cur.x--;
+          if (e.key === "ArrowRight" && !collide(cur.m, cur.x + 1, cur.y)) cur.x++;
+          if (e.key === "ArrowDown" && !collide(cur.m, cur.x, cur.y + 1)) cur.y++;
+          if (e.key === "ArrowUp") {
+            const rot = rotate(cur.m);
+            if (!collide(rot, cur.x, cur.y)) cur.m = rot;
+          }
+          if (e.key === " ") {
+            while (!collide(cur.m, cur.x, cur.y + 1)) cur.y++;
+            merge();
+          }
+          draw();
+        };
+        window.addEventListener("keydown", onKey);
+
+        function draw() {
+          ctx.fillStyle = "#050811"; ctx.fillRect(0, 0, 300, 480);
+          ctx.strokeStyle = "#1e293b"; ctx.strokeRect(30, 0, 240, 480);
+
+          for (let r = 0; r < ROWS; r++)
+            for (let c = 0; c < COLS; c++)
+              if (board[r][c]) {
+                ctx.fillStyle = COLORS[board[r][c]];
+                ctx.fillRect(30 + c * SZ + 1, r * SZ + 1, SZ - 2, SZ - 2);
+              }
+
+          cur.m.forEach((row, r) => row.forEach((v, c) => {
+            if (v) {
+              ctx.fillStyle = COLORS[cur.id];
+              ctx.fillRect(30 + (cur.x + c) * SZ + 1, (cur.y + r) * SZ + 1, SZ - 2, SZ - 2);
+            }
+          }));
+
+          ctx.fillStyle = "#fff"; ctx.font = "700 14px JetBrains Mono"; ctx.textAlign = "left";
+          ctx.fillText(`SCORE: ${score}`, 38, 22);
+
+          if (!alive) {
+            ctx.fillStyle = "rgba(4,6,14,0.85)"; ctx.fillRect(0, 0, 300, 480);
+            ctx.fillStyle = "#fff"; ctx.font = "900 26px Outfit"; ctx.textAlign = "center";
+            ctx.fillText("MATRIX FULL", 150, 220);
+            ctx.font = "700 16px JetBrains Mono"; ctx.fillStyle = "#a855f7";
+            ctx.fillText(`SCORE: ${score}`, 150, 255);
+          }
+        }
+
+        const dropTimer = setInterval(() => {
+          if (!alive) return;
+          if (!collide(cur.m, cur.x, cur.y + 1)) cur.y++;
+          else merge();
+          draw();
+        }, 420);
+
+        draw();
+        return () => { clearInterval(dropTimer); window.removeEventListener("keydown", onKey); };
+      },
+
+      // 6. SKY FLAP (FLAPPY BIRD)
+      flappy(stage, hint) {
+        hint.textContent = "Click canvas or press SPACE / UP Arrow to flap through neon laser gates!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 440; canvas.height = 480; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let y = 220, vy = 0, score = 0, alive = true, frame = 0, raf;
+        let shield = GameAPI.hasPowerup("shield_start");
+        const pipes = [];
+
+        function flap() {
+          if (!alive) return;
+          vy = -6.8;
+          SFX.play("click");
+        }
+        canvas.addEventListener("mousedown", flap);
+        const onKey = e => { if (e.key === " " || e.key === "ArrowUp") flap(); };
+        window.addEventListener("keydown", onKey);
+
+        function loop() {
+          if (!alive) return;
+          frame++;
+          vy += 0.36;
+          y += vy;
+          const sk = GameAPI.getSkin("flappy");
+
+          if (frame % 95 === 0) {
+            const topH = 65 + Math.random() * 210;
+            pipes.push({ x: 460, top: topH, gap: 132, passed: false });
+          }
+
+          ctx.fillStyle = "#060916"; ctx.fillRect(0, 0, 440, 480);
+
+          for (let i = pipes.length - 1; i >= 0; i--) {
+            const p = pipes[i];
+            p.x -= 2.8;
+            ctx.fillStyle = "#10b981";
+            ctx.fillRect(p.x, 0, 48, p.top);
+            ctx.fillRect(p.x, p.top + p.gap, 48, 480 - (p.top + p.gap));
+
+            if (!p.passed && p.x + 48 < 110) {
+              p.passed = true;
+              score++;
+              GameAPI.addCoins(3);
+              SFX.play("coin");
+            }
+
+            const hitPipe = (124 > p.x && 96 < p.x + 48) && (y - 13 < p.top || y + 13 > p.top + p.gap);
+            if (hitPipe) {
+              if (shield) {
+                shield = false;
+                pipes.splice(i, 1);
+                SFX.play("hit");
+                showToast("🛡️ Shield saved your flight!");
+                continue;
+              }
+              alive = false;
+            }
+            if (p.x < -60) pipes.splice(i, 1);
+          }
+
+          if (y < 10 || y > 470) alive = false;
+
+          ctx.fillStyle = sk.color;
+          ctx.beginPath(); ctx.arc(110, y, 14, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = sk.accent;
+          ctx.beginPath(); ctx.arc(116, y - 3, 4, 0, Math.PI * 2); ctx.fill();
+
+          ctx.fillStyle = "#fff"; ctx.font = "900 26px JetBrains Mono"; ctx.textAlign = "center";
+          ctx.fillText(score, 220, 46);
+
+          if (!alive) {
+            SFX.play("gameover");
+            GameAPI.submitScore("flappy", score);
+            ctx.fillStyle = "rgba(4,6,14,0.82)"; ctx.fillRect(0, 0, 440, 480);
+            ctx.fillStyle = "#fff"; ctx.font = "900 28px Outfit";
+            ctx.fillText("FLIGHT ENDED", 220, 215);
+            ctx.font = "700 18px JetBrains Mono"; ctx.fillStyle = "#06b6d4";
+            ctx.fillText(`GATES CLEARED: ${score}`, 220, 250);
+            return;
+          }
+          raf = requestAnimationFrame(loop);
+        }
+        raf = requestAnimationFrame(loop);
+        return () => { cancelAnimationFrame(raf); window.removeEventListener("keydown", onKey); };
+      },
+
+      // 7. PRISM BREAKOUT
+      breakout(stage, hint) {
+        hint.textContent = "Move mouse or LEFT / RIGHT Arrows to bounce the energy orb and shatter all prism bricks!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 560; canvas.height = 440; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let px = 230, bx = 280, by = 320, vx = 3.6, vy = -3.8, score = 0, alive = true, raf;
+        const rows = 5, cols = 8;
+        const bricks = [];
+        const rowColors = ["#f43f5e", "#f97316", "#fbbf24", "#10b981", "#06b6d4"];
+        for (let r = 0; r < rows; r++)
+          for (let c = 0; c < cols; c++)
+            bricks.push({ x: 24 + c * 65, y: 45 + r * 26, w: 58, h: 18, color: rowColors[r], alive: true });
+
+        canvas.addEventListener("mousemove", e => {
+          const rect = canvas.getBoundingClientRect();
+          px = ((e.clientX - rect.left) / rect.width) * 560 - 50;
+        });
+
+        function loop() {
+          if (!alive) return;
+          const sk = GameAPI.getSkin("breakout");
+          px = Math.max(0, Math.min(460, px));
+          bx += vx; by += vy;
+          if (bx < 8 || bx > 552) vx *= -1;
+          if (by < 8) vy *= -1;
+
+          if (by > 402 && by < 418 && bx > px && bx < px + 100) {
+            vy = -Math.abs(vy) * 1.02;
+            vx = ((bx - (px + 50)) / 50) * 5.2;
+            SFX.play("hit");
+          }
+
+          bricks.forEach(b => {
+            if (!b.alive) return;
+            if (bx > b.x && bx < b.x + b.w && by > b.y && by < b.y + b.h) {
+              b.alive = false;
+              vy *= -1;
+              score += 25;
+              GameAPI.addCoins(2);
+              SFX.play("coin");
+            }
+          });
+
+          ctx.fillStyle = "#050811"; ctx.fillRect(0, 0, 560, 440);
+          bricks.forEach(b => {
+            if (b.alive) {
+              ctx.fillStyle = b.color;
+              ctx.beginPath(); ctx.roundRect(b.x, b.y, b.w, b.h, 5); ctx.fill();
+            }
+          });
+
+          ctx.fillStyle = sk.color;
+          ctx.beginPath(); ctx.roundRect(px, 408, 100, 12, 6); ctx.fill();
+
+          ctx.fillStyle = "#fff";
+          ctx.beginPath(); ctx.arc(bx, by, 7, 0, Math.PI * 2); ctx.fill();
+
+          ctx.fillStyle = "#fff"; ctx.font = "700 14px JetBrains Mono"; ctx.textAlign = "left";
+          ctx.fillText(`SCORE: ${score}`, 16, 24);
+
+          if (by > 445 || bricks.every(b => !b.alive)) {
+            alive = false;
+            GameAPI.submitScore("breakout", score);
+            SFX.play(bricks.every(b => !b.alive) ? "powerup" : "gameover");
+            ctx.fillStyle = "rgba(4,6,14,0.82)"; ctx.fillRect(0, 0, 560, 440);
+            ctx.fillStyle = "#fff"; ctx.font = "900 28px Outfit"; ctx.textAlign = "center";
+            ctx.fillText(bricks.every(b => !b.alive) ? "STAGE CLEARED!" : "ORB LOST", 280, 210);
+            ctx.font = "700 18px JetBrains Mono"; ctx.fillStyle = "#06b6d4";
+            ctx.fillText(`SCORE: ${score}`, 280, 248);
+            return;
+          }
+          raf = requestAnimationFrame(loop);
+        }
+        raf = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(raf);
+      },
+
+      // 8. STAR VANGUARD (SPACE INVADERS)
+      invaders(stage, hint) {
+        hint.textContent = "LEFT / RIGHT Arrows to fly, SPACE to fire plasma bolts!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 540; canvas.height = 460; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let sx = 270, score = 0, alive = true, dir = 1, cooldown = 0, raf;
+        const rapid = GameAPI.hasPowerup("rapid_laser");
+        const bullets = [];
+        const aliens = [];
+        for (let r = 0; r < 4; r++)
+          for (let c = 0; c < 9; c++)
+            aliens.push({ x: 55 + c * 48, y: 45 + r * 36, alive: true });
+
+        const keys = {};
+        const onDown = e => keys[e.key] = true;
+        const onUp = e => keys[e.key] = false;
+        window.addEventListener("keydown", onDown);
+        window.addEventListener("keyup", onUp);
+
+        function loop() {
+          if (!alive) return;
+          if (cooldown > 0) cooldown--;
+          if (keys["ArrowLeft"] || keys["a"]) sx = Math.max(25, sx - 5);
+          if (keys["ArrowRight"] || keys["d"]) sx = Math.min(515, sx + 5);
+          if ((keys[" "] || keys["ArrowUp"]) && cooldown === 0) {
+            bullets.push({ x: sx, y: 410 });
+            cooldown = rapid ? 7 : 15;
+            SFX.play("hit");
+          }
+
+          let edge = false;
+          aliens.forEach(a => {
+            if (!a.alive) return;
+            a.x += dir * 1.45;
+            if (a.x > 505 || a.x < 35) edge = true;
+          });
+          if (edge) {
+            dir *= -1;
+            aliens.forEach(a => a.y += 16);
+          }
+
+          ctx.fillStyle = "#050811"; ctx.fillRect(0, 0, 540, 460);
+
+          for (let i = bullets.length - 1; i >= 0; i--) {
+            const b = bullets[i];
+            b.y -= 7.5;
+            ctx.fillStyle = "#fbbf24"; ctx.fillRect(b.x - 2, b.y, 4, 12);
+            aliens.forEach(a => {
+              if (a.alive && Math.abs(b.x - a.x) < 18 && Math.abs(b.y - a.y) < 14) {
+                a.alive = false;
+                b.y = -50;
+                score += 40;
+                GameAPI.addCoins(3);
+                SFX.play("coin");
+              }
+            });
+            if (b.y < 0) bullets.splice(i, 1);
+          }
+
+          aliens.forEach(a => {
+            if (!a.alive) return;
+            ctx.fillStyle = "#a855f7";
+            ctx.beginPath(); ctx.roundRect(a.x - 14, a.y - 10, 28, 20, 6); ctx.fill();
+            ctx.fillStyle = "#fff"; ctx.fillRect(a.x - 7, a.y - 3, 4, 4); ctx.fillRect(a.x + 3, a.y - 3, 4, 4);
+            if (a.y > 395) alive = false;
+          });
+
+          const sk = GameAPI.getSkin("invaders");
+          ctx.fillStyle = sk.color;
+          ctx.beginPath(); ctx.moveTo(sx, 405); ctx.lineTo(sx - 18, 435); ctx.lineTo(sx + 18, 435); ctx.closePath(); ctx.fill();
+
+          ctx.fillStyle = "#fff"; ctx.font = "700 14px JetBrains Mono"; ctx.textAlign = "left";
+          ctx.fillText(`SCORE: ${score}`, 16, 24);
+
+          if (!alive || aliens.every(a => !a.alive)) {
+            alive = false;
+            GameAPI.submitScore("invaders", score);
+            SFX.play(aliens.every(a => !a.alive) ? "powerup" : "gameover");
+            ctx.fillStyle = "rgba(4,6,14,0.84)"; ctx.fillRect(0, 0, 540, 460);
+            ctx.fillStyle = "#fff"; ctx.font = "900 28px Outfit"; ctx.textAlign = "center";
+            ctx.fillText(aliens.every(a => !a.alive) ? "SECTOR DEFENDED!" : "INVASION BREACHED", 270, 215);
+            ctx.font = "700 18px JetBrains Mono"; ctx.fillStyle = "#06b6d4";
+            ctx.fillText(`SCORE: ${score}`, 270, 250);
+            return;
+          }
+          raf = requestAnimationFrame(loop);
+        }
+        raf = requestAnimationFrame(loop);
+        return () => {
+          cancelAnimationFrame(raf);
+          window.removeEventListener("keydown", onDown);
+          window.removeEventListener("keyup", onUp);
+        };
+      },
+
+      // 9. 2048 QUANTUM
+      "2048"(stage, hint) {
+        hint.textContent = "Use Arrow Keys (Up, Down, Left, Right) to slide and merge matching energy tiles!";
+        let board = Array.from({ length: 4 }, () => Array(4).fill(0));
+        let score = 0;
+
+        function addTile() {
+          const empty = [];
+          for (let r = 0; r < 4; r++)
+            for (let c = 0; c < 4; c++)
+              if (board[r][c] === 0) empty.push([r, c]);
+          if (empty.length) {
+            const [r, c] = empty[Math.floor(Math.random() * empty.length)];
+            board[r][c] = Math.random() < 0.9 ? 2 : 4;
+          }
+        }
+        addTile(); addTile();
+
+        const tileColors = {
+          0: "#0d1324", 2: "#1e293b", 4: "#334155", 8: "#0284c7",
+          16: "#0891b2", 32: "#059669", 64: "#d97706", 128: "#ea580c",
+          256: "#e11d48", 512: "#9333ea", 1024: "#6366f1", 2048: "#fbbf24"
+        };
+
+        function render() {
+          stage.innerHTML = `
+            <div style="text-align:center;">
+              <div style="font-family:var(--font-mono); font-size:1.2rem; font-weight:800; color:#fbbf24; margin-bottom:0.85rem;">SCORE: ${score}</div>
+              <div style="display:grid; grid-template-columns:repeat(4, 82px); gap:10px; background:#070a14; padding:12px; border-radius:14px; border:1px solid var(--border-subtle);">
+                ${board.flat().map(v => `
+                  <div style="width:82px; height:82px; border-radius:10px; background:${tileColors[v] || '#a855f7'}; display:grid; place-items:center; font-family:var(--font-mono); font-weight:900; font-size:${v >= 1024 ? '1.25rem' : '1.6rem'}; color:#fff;">
+                    ${v || ''}
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        function slideRow(row) {
+          let arr = row.filter(v => v);
+          for (let i = 0; i < arr.length - 1; i++) {
+            if (arr[i] === arr[i + 1]) {
+              arr[i] *= 2;
+              score += arr[i];
+              GameAPI.addCoins(Math.max(1, Math.floor(arr[i] / 16)));
+              arr.splice(i + 1, 1);
+            }
+          }
+          while (arr.length < 4) arr.push(0);
+          return arr;
+        }
+
+        const onKey = e => {
+          const prev = JSON.stringify(board);
+          if (e.key === "ArrowLeft") board = board.map(slideRow);
+          else if (e.key === "ArrowRight") board = board.map(r => slideRow([...r].reverse()).reverse());
+          else if (e.key === "ArrowUp") {
+            for (let c = 0; c < 4; c++) {
+              const col = slideRow([board[0][c], board[1][c], board[2][c], board[3][c]]);
+              for (let r = 0; r < 4; r++) board[r][c] = col[r];
+            }
+          } else if (e.key === "ArrowDown") {
+            for (let c = 0; c < 4; c++) {
+              const col = slideRow([board[3][c], board[2][c], board[1][c], board[0][c]]).reverse();
+              for (let r = 0; r < 4; r++) board[r][c] = col[r];
+            }
+          } else return;
+
+          if (JSON.stringify(board) !== prev) {
+            SFX.play("click");
+            addTile();
+            GameAPI.submitScore("2048", score);
+            render();
+          }
+        };
+        window.addEventListener("keydown", onKey);
+        render();
+        return () => window.removeEventListener("keydown", onKey);
+      },
+
+      // 10. CYBER SWEEPER (MINESWEEPER)
+      minesweeper(stage, hint) {
+        hint.textContent = "Left-click to reveal safe cells, Right-click to place a Danger Flag!";
+        const R = 10, C = 12, MINES = 16;
+        const grid = Array.from({ length: R }, () =>
+          Array.from({ length: C }, () => ({ mine: false, open: false, flag: false, count: 0 }))
+        );
+        let placed = 0, over = false;
+        while (placed < MINES) {
+          const r = Math.floor(Math.random() * R), c = Math.floor(Math.random() * C);
+          if (!grid[r][c].mine) { grid[r][c].mine = true; placed++; }
+        }
+        for (let r = 0; r < R; r++)
+          for (let c = 0; c < C; c++) {
+            let n = 0;
+            for (let dr = -1; dr <= 1; dr++)
+              for (let dc = -1; dc <= 1; dc++)
+                if (grid[r + dr]?.[c + dc]?.mine) n++;
+            grid[r][c].count = n;
+          }
+
+        function reveal(r, c) {
+          const cell = grid[r]?.[c];
+          if (!cell || cell.open || cell.flag || over) return;
+          cell.open = true;
+          if (cell.mine) {
+            over = true;
+            SFX.play("gameover");
+            grid.flat().forEach(x => { if (x.mine) x.open = true; });
+            return;
+          }
+          if (cell.count === 0) {
+            for (let dr = -1; dr <= 1; dr++)
+              for (let dc = -1; dc <= 1; dc++) reveal(r + dr, c + dc);
+          }
+          const safeLeft = grid.flat().filter(x => !x.mine && !x.open).length;
+          if (safeLeft === 0) {
+            over = true;
+            const coins = GameAPI.addCoins(40);
+            GameAPI.submitScore("minesweeper", 1000);
+            SFX.play("powerup");
+            showToast(`🎉 Minefield Cleared! +${coins} Coins!`);
+          }
+        }
+
+        function render() {
+          stage.innerHTML = `
+            <div style="display:grid; grid-template-columns:repeat(${C}, 34px); gap:4px;">
+              ${grid.map((row, r) => row.map((cell, c) => `
+                <button data-r="${r}" data-c="${c}" style="width:34px; height:34px; border-radius:6px; border:1px solid rgba(148,163,184,0.2); background:${cell.open ? (cell.mine ? '#e11d48' : '#0f172a') : '#1e293b'}; color:#fff; font-family:var(--font-mono); font-weight:800; cursor:pointer;">
+                  ${cell.open ? (cell.mine ? '💣' : (cell.count || '')) : (cell.flag ? '🚩' : '')}
+                </button>
+              `).join("")).join("")}
+            </div>
+          `;
+          stage.querySelectorAll("button").forEach(btn => {
+            btn.onclick = () => {
+              reveal(+btn.dataset.r, +btn.dataset.c);
+              SFX.play("click");
+              render();
+            };
+            btn.oncontextmenu = e => {
+              e.preventDefault();
+              if (!over) {
+                grid[+btn.dataset.r][+btn.dataset.c].flag ^= true;
+                render();
+              }
+            };
+          });
+        }
+        render();
+        return () => {};
+      },
+
+      // 11. HYPER PONG
+      pong(stage, hint) {
+        hint.textContent = "Move mouse or UP / DOWN Arrows to control the left neon paddle. First to 7 wins!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 580; canvas.height = 380; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let py = 150, ay = 150, bx = 290, by = 190, vx = 4.6, vy = 3.2, pScore = 0, aScore = 0, raf;
+        canvas.addEventListener("mousemove", e => {
+          const rect = canvas.getBoundingClientRect();
+          py = ((e.clientY - rect.top) / rect.height) * 380 - 40;
+        });
+
+        function resetBall(dir) {
+          bx = 290; by = 190; vx = 4.6 * dir; vy = (Math.random() - 0.5) * 6;
+        }
+
+        function loop() {
+          py = Math.max(0, Math.min(300, py));
+          ay += ((by - 40) - ay) * 0.085;
+          bx += vx; by += vy;
+
+          if (by < 8 || by > 372) vy *= -1;
+          if (bx < 28 && by > py && by < py + 80) { vx = Math.abs(vx) * 1.04; SFX.play("hit"); }
+          if (bx > 552 && by > ay && by < ay + 80) { vx = -Math.abs(vx) * 1.04; SFX.play("hit"); }
+
+          if (bx < 0) { aScore++; resetBall(1); }
+          if (bx > 580) {
+            pScore++;
+            GameAPI.addCoins(8);
+            GameAPI.submitScore("pong", pScore * 100);
+            SFX.play("coin");
+            resetBall(-1);
+          }
+
+          ctx.fillStyle = "#050811"; ctx.fillRect(0, 0, 580, 380);
+          ctx.setLineDash([8, 8]); ctx.strokeStyle = "#1e293b";
+          ctx.beginPath(); ctx.moveTo(290, 0); ctx.lineTo(290, 380); ctx.stroke();
+          ctx.setLineDash([]);
+
+          ctx.fillStyle = "#06b6d4"; ctx.fillRect(16, py, 10, 80);
+          ctx.fillStyle = "#f43f5e"; ctx.fillRect(554, ay, 10, 80);
+          ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(bx, by, 8, 0, Math.PI * 2); ctx.fill();
+
+          ctx.font = "900 28px JetBrains Mono"; ctx.textAlign = "center";
+          ctx.fillText(`${pScore}   ${aScore}`, 290, 42);
+          raf = requestAnimationFrame(loop);
+        }
+        raf = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(raf);
+      },
+
+      // 12. MAZE RUNNER (PAC-MAZE)
+      pacman(stage, hint) {
+        hint.textContent = "Use Arrow Keys to navigate the neon maze, collect all energy dots & avoid ghosts!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 420; canvas.height = 420; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        const MAP = [
+          "###############",
+          "#......#......#",
+          "#.####.#.####.#",
+          "#.............#",
+          "#.####.#.####.#",
+          "#......#......#",
+          "###.#######.###",
+          "#.............#",
+          "###.#######.###",
+          "#......#......#",
+          "#.####.#.####.#",
+          "#.............#",
+          "#.####.#.####.#",
+          "#......#......#",
+          "###############"
+        ].map(r => r.split(""));
+
+        let px = 1, py = 1, score = 0, alive = true;
+        const ghosts = [
+          { x: 13, y: 1, c: "#f43f5e" },
+          { x: 13, y: 13, c: "#06b6d4" },
+          { x: 1, y: 13, c: "#a855f7" }
+        ];
+
+        const onKey = e => {
+          if (!alive) return;
+          let nx = px, ny = py;
+          if (e.key === "ArrowUp") ny--;
+          if (e.key === "ArrowDown") ny++;
+          if (e.key === "ArrowLeft") nx--;
+          if (e.key === "ArrowRight") nx++;
+          if (MAP[ny]?.[nx] !== "#") {
+            px = nx; py = ny;
+            if (MAP[py][px] === ".") {
+              MAP[py][px] = " ";
+              score += 10;
+              GameAPI.addCoins(1);
+              SFX.play("coin");
+            }
+          }
+          draw();
+        };
+        window.addEventListener("keydown", onKey);
+
+        function draw() {
+          const S = 28;
+          ctx.fillStyle = "#050811"; ctx.fillRect(0, 0, 420, 420);
+          for (let r = 0; r < 15; r++)
+            for (let c = 0; c < 15; c++) {
+              if (MAP[r][c] === "#") {
+                ctx.fillStyle = "#1e3a8a";
+                ctx.fillRect(c * S + 1, r * S + 1, S - 2, S - 2);
+              } else if (MAP[r][c] === ".") {
+                ctx.fillStyle = "#fde047";
+                ctx.beginPath(); ctx.arc(c * S + 14, r * S + 14, 3.5, 0, Math.PI * 2); ctx.fill();
+              }
+            }
+
+          ctx.fillStyle = "#fbbf24";
+          ctx.beginPath(); ctx.arc(px * S + 14, py * S + 14, 10, 0.25, Math.PI * 1.85); ctx.lineTo(px * S + 14, py * S + 14); ctx.fill();
+
+          ghosts.forEach(g => {
+            ctx.fillStyle = g.c;
+            ctx.beginPath(); ctx.arc(g.x * S + 14, g.y * S + 14, 10, 0, Math.PI * 2); ctx.fill();
+          });
+
+          ctx.fillStyle = "#fff"; ctx.font = "700 13px JetBrains Mono"; ctx.textAlign = "left";
+          ctx.fillText(`SCORE: ${score}`, 10, 18);
+        }
+
+        const gTimer = setInterval(() => {
+          if (!alive) return;
+          ghosts.forEach(g => {
+            const dirs = [[1,0],[-1,0],[0,1],[0,-1]].filter(([dx, dy]) => MAP[g.y + dy]?.[g.x + dx] !== "#");
+            dirs.sort((a, b) => Math.hypot((g.x + a[0]) - px, (g.y + a[1]) - py) - Math.hypot((g.x + b[0]) - px, (g.y + b[1]) - py));
+            const pick = Math.random() < 0.72 ? dirs[0] : dirs[Math.floor(Math.random() * dirs.length)];
+            if (pick) { g.x += pick[0]; g.y += pick[1]; }
+            if (g.x === px && g.y === py) {
+              alive = false;
+              SFX.play("gameover");
+              GameAPI.submitScore("pacman", score);
+              showToast(`👻 Caught! Final Score: ${score}`);
+            }
+          });
+          draw();
+        }, 360);
+
+        draw();
+        return () => { clearInterval(gTimer); window.removeEventListener("keydown", onKey); };
+      },
+
+      // 13. ASTEROID BELT
+      asteroids(stage, hint) {
+        hint.textContent = "LEFT / RIGHT to rotate ship, UP to thrust, SPACE to fire plasma cannon!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 540; canvas.height = 440; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let ship = { x: 270, y: 220, vx: 0, vy: 0, a: -Math.PI / 2 };
+        let score = 0, alive = true, raf, cool = 0;
+        const bullets = [];
+        const rocks = Array.from({ length: 7 }, () => ({
+          x: Math.random() * 540, y: Math.random() * 440,
+          vx: (Math.random() - 0.5) * 3, vy: (Math.random() - 0.5) * 3, r: 28
+        }));
+        const keys = {};
+        const onDown = e => keys[e.key] = true;
+        const onUp = e => keys[e.key] = false;
+        window.addEventListener("keydown", onDown);
+        window.addEventListener("keyup", onUp);
+
+        function loop() {
+          if (!alive) return;
+          if (cool > 0) cool--;
+          if (keys["ArrowLeft"]) ship.a -= 0.075;
+          if (keys["ArrowRight"]) ship.a += 0.075;
+          if (keys["ArrowUp"]) {
+            ship.vx += Math.cos(ship.a) * 0.16;
+            ship.vy += Math.sin(ship.a) * 0.16;
+          }
+          if (keys[" "] && cool === 0) {
+            bullets.push({ x: ship.x, y: ship.y, vx: Math.cos(ship.a) * 7.5, vy: Math.sin(ship.a) * 7.5, life: 55 });
+            cool = GameAPI.hasPowerup("rapid_laser") ? 6 : 13;
+            SFX.play("hit");
+          }
+
+          ship.x = (ship.x + ship.vx + 540) % 540;
+          ship.y = (ship.y + ship.vy + 440) % 440;
+          ship.vx *= 0.99; ship.vy *= 0.99;
+
+          ctx.fillStyle = "#050811"; ctx.fillRect(0, 0, 540, 440);
+
+          for (let i = bullets.length - 1; i >= 0; i--) {
+            const b = bullets[i];
+            b.x = (b.x + b.vx + 540) % 540;
+            b.y = (b.y + b.vy + 440) % 440;
+            b.life--;
+            ctx.fillStyle = "#fbbf24"; ctx.fillRect(b.x - 2, b.y - 2, 4, 4);
+            if (b.life <= 0) bullets.splice(i, 1);
+          }
+
+          for (let i = rocks.length - 1; i >= 0; i--) {
+            const r = rocks[i];
+            r.x = (r.x + r.vx + 540) % 540;
+            r.y = (r.y + r.vy + 440) % 440;
+            ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2); ctx.stroke();
+
+            if (Math.hypot(r.x - ship.x, r.y - ship.y) < r.r + 10) {
+              alive = false;
+              SFX.play("gameover");
+              GameAPI.submitScore("asteroids", score);
+            }
+
+            bullets.forEach(b => {
+              if (Math.hypot(r.x - b.x, r.y - b.y) < r.r) {
+                b.life = 0;
+                score += 50;
+                GameAPI.addCoins(3);
+                SFX.play("coin");
+                if (r.r > 16) {
+                  rocks.push({ x: r.x, y: r.y, vx: -r.vy, vy: r.vx, r: 15 });
+                  rocks.push({ x: r.x, y: r.y, vx: r.vy, vy: -r.vx, r: 15 });
+                }
+                rocks.splice(i, 1);
+              }
+            });
+          }
+
+          if (rocks.length < 4) {
+            rocks.push({ x: 0, y: Math.random() * 440, vx: 2, vy: (Math.random() - 0.5) * 3, r: 28 });
+          }
+
+          ctx.save();
+          ctx.translate(ship.x, ship.y); ctx.rotate(ship.a);
+          ctx.strokeStyle = "#06b6d4"; ctx.lineWidth = 2.5;
+          ctx.beginPath(); ctx.moveTo(14, 0); ctx.lineTo(-10, -9); ctx.lineTo(-10, 9); ctx.closePath(); ctx.stroke();
+          ctx.restore();
+
+          ctx.fillStyle = "#fff"; ctx.font = "700 14px JetBrains Mono"; ctx.textAlign = "left";
+          ctx.fillText(`SCORE: ${score}`, 16, 24);
+          if (alive) raf = requestAnimationFrame(loop);
+        }
+        raf = requestAnimationFrame(loop);
+        return () => {
+          cancelAnimationFrame(raf);
+          window.removeEventListener("keydown", onDown);
+          window.removeEventListener("keyup", onUp);
+        };
+      },
+
+      // 14. CYBER DINO RUN
+      dino(stage, hint) {
+        hint.textContent = "Press SPACE or UP Arrow (or Click) to leap over laser barriers!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 600; canvas.height = 300; canvas.className = "game-canvas";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let dy = 220, vy = 0, score = 0, speed = 6.2, frame = 0, alive = true, raf;
+        const obs = [];
+        function jump() { if (dy >= 219) { vy = -11.5; SFX.play("click"); } }
+        canvas.addEventListener("mousedown", jump);
+        const onKey = e => { if (e.key === " " || e.key === "ArrowUp") jump(); };
+        window.addEventListener("keydown", onKey);
+
+        function loop() {
+          if (!alive) return;
+          frame++;
+          score += 0.25;
+          speed = Math.min(13, 6.2 + score * 0.004);
+          vy += 0.62;
+          dy = Math.min(220, dy + vy);
+
+          if (frame % Math.max(45, Math.floor(85 - speed * 3)) === 0) {
+            obs.push({ x: 620, h: 28 + Math.random() * 22 });
+          }
+
+          ctx.fillStyle = "#050811"; ctx.fillRect(0, 0, 600, 300);
+          ctx.strokeStyle = "#10b981"; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(0, 252); ctx.lineTo(600, 252); ctx.stroke();
+
+          ctx.fillStyle = "#06b6d4";
+          ctx.beginPath(); ctx.roundRect(65, dy, 28, 32, 6); ctx.fill();
+
+          for (let i = obs.length - 1; i >= 0; i--) {
+            const o = obs[i];
+            o.x -= speed;
+            ctx.fillStyle = "#f43f5e";
+            ctx.fillRect(o.x, 252 - o.h, 18, o.h);
+            if (o.x < 90 && o.x + 18 > 68 && dy + 30 > 252 - o.h) {
+              alive = false;
+              SFX.play("gameover");
+              GameAPI.submitScore("dino", Math.floor(score));
+              GameAPI.addCoins(Math.floor(score / 15));
+            }
+            if (o.x < -30) obs.splice(i, 1);
+          }
+
+          ctx.fillStyle = "#fff"; ctx.font = "700 16px JetBrains Mono"; ctx.textAlign = "right";
+          ctx.fillText(`DIST: ${Math.floor(score)}m`, 580, 30);
+          if (alive) raf = requestAnimationFrame(loop);
+        }
+        raf = requestAnimationFrame(loop);
+        return () => { cancelAnimationFrame(raf); window.removeEventListener("keydown", onKey); };
+      },
+
+      // 15. MEMORY MATRIX
+      memory(stage, hint) {
+        hint.textContent = "Flip cards to match all 8 cyber pairs in as few moves as possible!";
+        const icons = ["🚀", "⚡", "💎", "🔥", "👾", "🛸", "🎯", "👑"];
+        const deck = [...icons, ...icons].sort(() => Math.random() - 0.5).map((icon, i) => ({ i, icon, open: false, done: false }));
+        let flipped = [], moves = 0, lock = false;
+
+        function render() {
+          stage.innerHTML = `
+            <div style="text-align:center;">
+              <div style="font-family:var(--font-mono); margin-bottom:0.85rem; color:#06b6d4; font-weight:700;">MOVES: ${moves}</div>
+              <div style="display:grid; grid-template-columns:repeat(4, 78px); gap:10px;">
+                ${deck.map((c, idx) => `
+                  <button data-idx="${idx}" style="width:78px; height:78px; border-radius:12px; border:1px solid ${c.done ? '#10b981' : 'rgba(148,163,184,0.25)'}; background:${c.open || c.done ? '#1e293b' : '#0f172a'}; font-size:2rem; cursor:pointer; color:#fff;">
+                    ${c.open || c.done ? c.icon : '❓'}
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+          `;
+          stage.querySelectorAll("button").forEach(btn => {
+            btn.onclick = () => {
+              const card = deck[+btn.dataset.idx];
+              if (lock || card.open || card.done) return;
+              card.open = true;
+              flipped.push(card);
+              SFX.play("click");
+              render();
+              if (flipped.length === 2) {
+                moves++;
+                lock = true;
+                setTimeout(() => {
+                  if (flipped[0].icon === flipped[1].icon) {
+                    flipped[0].done = flipped[1].done = true;
+                    SFX.play("coin");
+                  } else {
+                    flipped[0].open = flipped[1].open = false;
+                  }
+                  flipped = []; lock = false;
+                  render();
+                  if (deck.every(x => x.done)) {
+                    const pts = Math.max(200, 1200 - moves * 30);
+                    GameAPI.submitScore("memory", pts);
+                    const c = GameAPI.addCoins(30);
+                    showToast(`🧠 Matrix Solved! +${c} Coins!`);
+                  }
+                }, 520);
+              }
+            };
+          });
+        }
+        render();
+        return () => {};
+      },
+
+      // 16. REFLEX AIM LAB
+      aim(stage, hint) {
+        hint.textContent = "Click the glowing targets as fast as possible for 25 seconds!";
+        const canvas = document.createElement("canvas");
+        canvas.width = 560; canvas.height = 400; canvas.className = "game-canvas";
+        canvas.style.cursor = "crosshair";
+        stage.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let score = 0, timeLeft = 25, target = { x: 280, y: 200, r: 24 };
+        canvas.addEventListener("mousedown", e => {
+          if (timeLeft <= 0) return;
+          const rect = canvas.getBoundingClientRect();
+          const mx = ((e.clientX - rect.left) / rect.width) * 560;
+          const my = ((e.clientY - rect.top) / rect.height) * 400;
+          if (Math.hypot(mx - target.x, my - target.y) <= target.r + 4) {
+            score += 100;
+            GameAPI.addCoins(2);
+            SFX.play("coin");
+            target = { x: 45 + Math.random() * 470, y: 55 + Math.random() * 300, r: 22 };
+            draw();
+          }
+        });
+
+        function draw() {
+          ctx.fillStyle = "#050811"; ctx.fillRect(0, 0, 560, 400);
+          ctx.fillStyle = "#fff"; ctx.font = "700 15px JetBrains Mono"; ctx.textAlign = "left";
+          ctx.fillText(`SCORE: ${score}  |  TIME: ${timeLeft}s`, 16, 26);
+
+          if (timeLeft > 0) {
+            ctx.fillStyle = "#f43f5e";
+            ctx.beginPath(); ctx.arc(target.x, target.y, target.r, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "#fff";
+            ctx.beginPath(); ctx.arc(target.x, target.y, 8, 0, Math.PI * 2); ctx.fill();
+          } else {
+            GameAPI.submitScore("aim", score);
+            ctx.fillStyle = "#06b6d4"; ctx.font = "900 30px Outfit"; ctx.textAlign = "center";
+            ctx.fillText(`TIME UP! SCORE: ${score}`, 280, 205);
+          }
+        }
+        draw();
+        const timer = setInterval(() => {
+          timeLeft--;
+          draw();
+          if (timeLeft <= 0) clearInterval(timer);
+        }, 1000);
+        return () => clearInterval(timer);
+      },
+
+      // 17. SYNTH SIMON
+      simon(stage, hint) {
+        hint.textContent = "Watch & listen to the synth sequence, then repeat the exact pad order!";
+        const pads = [
+          { color: "#10b981", freq: 329.6 },
+          { color: "#f43f5e", freq: 440.0 },
+          { color: "#fbbf24", freq: 554.4 },
+          { color: "#3b82f6", freq: 659.3 }
+        ];
+        let seq = [], userIdx = 0, playing = false;
+
+        stage.innerHTML = `
+          <div style="text-align:center;">
+            <div id="simonStatus" style="font-family:var(--font-mono); font-weight:800; color:#06b6d4; margin-bottom:1rem;">ROUND 1</div>
+            <div style="display:grid; grid-template-columns:130px 130px; gap:14px;">
+              ${pads.map((p, i) => `
+                <button id="spad_${i}" style="width:130px; height:130px; border-radius:18px; border:none; background:${p.color}; opacity:0.55; cursor:pointer; transition:opacity 0.12s, transform 0.12s;"></button>
+              `).join("")}
+            </div>
+          </div>
+        `;
+
+        function flash(i) {
+          const el = stage.querySelector(`#spad_${i}`);
+          if (!el) return;
+          el.style.opacity = "1"; el.style.transform = "scale(1.04)";
+          SFX.tone(pads[i].freq, 0.25);
+          setTimeout(() => { if (el) { el.style.opacity = "0.55"; el.style.transform = "scale(1)"; } }, 260);
+        }
+
+        function nextRound() {
+          playing = true; userIdx = 0;
+          seq.push(Math.floor(Math.random() * 4));
+          stage.querySelector("#simonStatus").textContent = `ROUND ${seq.length} — WATCH`;
+          seq.forEach((padIdx, step) => {
+            setTimeout(() => flash(padIdx), 550 * (step + 1));
+          });
+          setTimeout(() => {
+            playing = false;
+            const st = stage.querySelector("#simonStatus");
+            if (st) st.textContent = `ROUND ${seq.length} — YOUR TURN`;
+          }, 550 * (seq.length + 1));
+        }
+
+        pads.forEach((_, i) => {
+          stage.querySelector(`#spad_${i}`).onclick = () => {
+            if (playing) return;
+            flash(i);
+            if (i === seq[userIdx]) {
+              userIdx++;
+              if (userIdx === seq.length) {
+                GameAPI.addCoins(10);
+                GameAPI.submitScore("simon", seq.length * 100);
+                setTimeout(nextRound, 650);
+              }
+            } else {
+              SFX.play("gameover");
+              stage.querySelector("#simonStatus").textContent = `WRONG PAD! REACHED ROUND ${seq.length}`;
+              playing = true;
+            }
+          };
+        });
+
+        setTimeout(nextRound, 400);
+        return () => {};
+      },
+
+      // 18. CONNECT 4 ARENA
+      connect4(stage, hint) {
+        hint.textContent = "Click any column to drop your Gold disc. Connect 4 horizontally, vertically, or diagonally!";
+        const R = 6, C = 7;
+        const grid = Array.from({ length: R }, () => Array(C).fill(0));
+        let over = false;
+
+        function checkWin(p) {
+          for (let r = 0; r < R; r++)
+            for (let c = 0; c < C; c++) {
+              if (c + 3 < C && [0,1,2,3].every(k => grid[r][c + k] === p)) return true;
+              if (r + 3 < R && [0,1,2,3].every(k => grid[r + k][c] === p)) return true;
+              if (r + 3 < R && c + 3 < C && [0,1,2,3].every(k => grid[r + k][c + k] === p)) return true;
+              if (r - 3 >= 0 && c + 3 < C && [0,1,2,3].every(k => grid[r - k][c + k] === p)) return true;
+            }
+          return false;
+        }
+
+        function drop(col, player) {
+          for (let r = R - 1; r >= 0; r--) {
+            if (grid[r][col] === 0) { grid[r][col] = player; return true; }
+          }
+          return false;
+        }
+
+        function render() {
+          stage.innerHTML = `
+            <div style="background:#1e3a8a; padding:12px; border-radius:16px; display:grid; grid-template-columns:repeat(7, 50px); gap:8px;">
+              ${grid.map((row, r) => row.map((v, c) => `
+                <button data-c="${c}" style="width:50px; height:50px; border-radius:50%; border:none; cursor:pointer; background:${v === 1 ? '#fbbf24' : v === 2 ? '#f43f5e' : '#060913'}; box-shadow:inset 0 3px 8px rgba(0,0,0,0.6);"></button>
+              `).join("")).join("")}
+            </div>
+          `;
+          stage.querySelectorAll("button").forEach(btn => {
+            btn.onclick = () => {
+              if (over) return;
+              const col = +btn.dataset.c;
+              if (!drop(col, 1)) return;
+              SFX.play("click");
+              if (checkWin(1)) {
+                over = true;
+                const coins = GameAPI.addCoins(35);
+                GameAPI.submitScore("connect4", 500);
+                SFX.play("powerup");
+                render();
+                return showToast(`🏆 You connected 4! +${coins} Coins!`);
+              }
+              const valid = [0,1,2,3,4,5,6].filter(c => grid[0][c] === 0);
+              if (valid.length) {
+                const aiCol = valid[Math.floor(Math.random() * valid.length)];
+                drop(aiCol, 2);
+                if (checkWin(2)) {
+                  over = true;
+                  SFX.play("gameover");
+                  showToast("🤖 AI connected 4! Hit Restart to rematch.");
+                }
+              }
+              render();
+            };
+          });
+        }
+        render();
+        return () => {};
+      }
+    };
+
+    // =========================================================================
+    // 11. BOOTSTRAP
+    // =========================================================================
+    populateAdminDropdowns();
+    updateHud();
+    renderGameGrid();
+  </script>
+</body>
+</html>
