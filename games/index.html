@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ARCADE NEXUS — Play 18+ Games</title>
+  <title>ARCADE NEXUS — 18 Browser Games</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -32,30 +32,29 @@
     body {
       background-color: var(--bg-void);
       background-image:
-        radial-gradient(circle at 15% 10%, rgba(99, 102, 241, 0.14) 0%, transparent 40%),
-        radial-gradient(circle at 85% 15%, rgba(6, 182, 212, 0.12) 0%, transparent 42%),
-        radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.10) 0%, transparent 45%);
+        radial-gradient(circle at 15% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 15%, rgba(6, 182, 212, 0.10) 0%, transparent 42%),
+        radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.08) 0%, transparent 45%);
       color: var(--text-main);
       font-family: var(--font-sans);
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg-void); }
     ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #334155; }
 
-    /* Navbar */
+    /* Top Navbar & Primary Tabs */
     .navbar {
       position: sticky;
       top: 0;
       z-index: 50;
-      background: rgba(6, 8, 15, 0.85);
+      background: rgba(6, 8, 15, 0.9);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 0.85rem 2rem;
+      padding: 0.75rem 1.75rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -63,28 +62,35 @@
       flex-wrap: wrap;
     }
 
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.65rem;
       text-decoration: none;
       color: var(--text-main);
     }
 
     .brand-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
       background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
       display: grid;
       place-items: center;
       font-weight: 900;
-      font-size: 1.2rem;
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
+      font-size: 1.1rem;
+      box-shadow: 0 0 18px rgba(99, 102, 241, 0.4);
     }
 
     .brand-text {
-      font-size: 1.35rem;
+      font-size: 1.2rem;
       font-weight: 900;
       letter-spacing: 0.04em;
       background: linear-gradient(90deg, #fff, #94a3b8);
@@ -92,40 +98,132 @@
       -webkit-text-fill-color: transparent;
     }
 
+    .main-nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(13, 18, 32, 0.9);
+      border: 1px solid var(--border-subtle);
+      padding: 0.28rem;
+      border-radius: 12px;
+      flex-wrap: wrap;
+    }
+
+    .main-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 0.86rem;
+      padding: 0.48rem 0.9rem;
+      border-radius: 9px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.42rem;
+      transition: all 0.16s ease;
+      position: relative;
+    }
+
+    .main-tab:hover {
+      color: #fff;
+      background: rgba(30, 41, 59, 0.65);
+    }
+
+    .main-tab.active {
+      background: var(--accent-primary);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .tab-badge {
+      background: var(--accent-rose);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.1rem 0.42rem;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+    }
+
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.6rem;
       flex-wrap: wrap;
     }
 
     .hud-pill {
       display: flex;
       align-items: center;
-      gap: 0.45rem;
-      background: rgba(18, 25, 44, 0.9);
+      gap: 0.4rem;
+      background: rgba(18, 25, 44, 0.92);
       border: 1px solid var(--border-subtle);
-      padding: 0.45rem 0.85rem;
+      padding: 0.42rem 0.8rem;
       border-radius: 999px;
       font-family: var(--font-mono);
-      font-size: 0.85rem;
+      font-size: 0.83rem;
       font-weight: 700;
     }
 
     .hud-coin { color: var(--accent-amber); }
     .hud-gem { color: var(--accent-cyan); }
 
+    .presence-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(18, 25, 44, 0.92);
+      border: 1px solid var(--border-subtle);
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .presence-select {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+    .presence-select option {
+      background: var(--bg-surface);
+      color: #fff;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .status-dot.online {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .status-dot.offline {
+      background: #64748b;
+    }
+
     .btn {
       border: none;
       border-radius: 10px;
-      padding: 0.55rem 1rem;
+      padding: 0.5rem 0.92rem;
       font-family: var(--font-sans);
       font-weight: 700;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.45rem;
+      gap: 0.42rem;
       transition: all 0.18s ease;
       color: #fff;
     }
@@ -141,7 +239,7 @@
     .btn-redeem {
       background: linear-gradient(135deg, var(--accent-amber), #d97706);
       color: #090d16;
-      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28);
     }
     .btn-redeem:hover { filter: brightness(1.08); transform: translateY(-1px); }
 
@@ -151,6 +249,12 @@
     }
     .btn-admin:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
+    .btn-emerald {
+      background: linear-gradient(135deg, var(--accent-emerald), #059669);
+      color: #04130d;
+    }
+    .btn-emerald:hover { filter: brightness(1.1); }
+
     .btn-ghost {
       background: rgba(30, 41, 59, 0.65);
       border: 1px solid var(--border-subtle);
@@ -158,59 +262,41 @@
     }
     .btn-ghost:hover { background: rgba(51, 65, 85, 0.8); border-color: rgba(148,163,184,0.35); }
 
-    /* Hero */
-    .hero {
+    /* Page Container & Views */
+    .page-container {
       max-width: 1360px;
       margin: 0 auto;
-      padding: 2.5rem 2rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
+      padding: 1.5rem 1.75rem 4rem;
     }
 
-    .hero-banner {
-      background: linear-gradient(135deg, rgba(18, 25, 44, 0.92), rgba(13, 18, 32, 0.96));
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 2rem 2.25rem;
+    .view-section {
+      display: none;
+    }
+    .view-section.active {
+      display: block;
+    }
+
+    .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 2rem;
+      gap: 1rem;
       flex-wrap: wrap;
-      position: relative;
-      overflow: hidden;
+      margin-bottom: 1.25rem;
     }
 
-    .hero-banner::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      right: -10%;
-      width: 380px;
-      height: 380px;
-      background: radial-gradient(circle, rgba(6, 182, 212, 0.18), transparent 65%);
-      pointer-events: none;
-    }
-
-    .hero-title {
-      font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+    .section-title {
+      font-size: 1.5rem;
       font-weight: 900;
-      line-height: 1.12;
-      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
     }
 
-    .hero-title span {
-      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-primary), var(--accent-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero-sub {
+    .section-sub {
       color: var(--text-muted);
-      font-size: 1rem;
-      max-width: 600px;
-      line-height: 1.5;
+      font-size: 0.9rem;
+      margin-top: 0.2rem;
     }
 
     /* Controls Bar */
@@ -220,11 +306,12 @@
       align-items: center;
       gap: 1rem;
       flex-wrap: wrap;
+      margin-bottom: 1.35rem;
     }
 
     .category-tabs {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.45rem;
       flex-wrap: wrap;
     }
 
@@ -232,9 +319,9 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
-      padding: 0.5rem 1rem;
+      padding: 0.48rem 0.95rem;
       border-radius: 999px;
-      font-size: 0.86rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.16s ease;
@@ -258,7 +345,7 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
-      padding: 0.6rem 1rem;
+      padding: 0.58rem 1rem;
       color: #fff;
       font-family: var(--font-sans);
       font-size: 0.9rem;
@@ -268,12 +355,9 @@
 
     /* Game Grid */
     .game-grid {
-      max-width: 1360px;
-      margin: 0 auto;
-      padding: 0.5rem 2rem 4rem;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
-      gap: 1.35rem;
+      gap: 1.3rem;
     }
 
     .game-card {
@@ -296,11 +380,11 @@
     }
 
     .card-banner {
-      height: 132px;
+      height: 128px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 3.4rem;
+      font-size: 3.3rem;
       position: relative;
       overflow: hidden;
     }
@@ -322,29 +406,29 @@
     }
 
     .card-body {
-      padding: 1.15rem 1.25rem 1.25rem;
+      padding: 1.1rem 1.2rem 1.2rem;
       display: flex;
       flex-direction: column;
       flex: 1;
-      gap: 0.5rem;
+      gap: 0.48rem;
     }
 
     .card-title {
-      font-size: 1.15rem;
+      font-size: 1.12rem;
       font-weight: 800;
       color: #fff;
     }
 
     .card-desc {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       color: var(--text-muted);
       line-height: 1.45;
       flex: 1;
     }
 
     .card-footer {
-      margin-top: 0.65rem;
-      padding-top: 0.75rem;
+      margin-top: 0.6rem;
+      padding-top: 0.72rem;
       border-top: 1px solid rgba(148,163,184,0.1);
       display: flex;
       justify-content: space-between;
@@ -370,6 +454,124 @@
     .game-card:hover .play-pill {
       background: var(--accent-primary);
       color: #fff;
+    }
+
+    /* Panels & Cards */
+    .panel-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 1.35rem;
+    }
+
+    /* Friends & Messages Layout */
+    .friends-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1rem;
+    }
+
+    .friend-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .messages-layout {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 1rem;
+      min-height: 540px;
+    }
+    @media (max-width: 820px) {
+      .messages-layout { grid-template-columns: 1fr; }
+    }
+
+    .chat-sidebar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .chat-thread-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      padding: 0.65rem 0.8rem;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      transition: all 0.15s;
+    }
+    .chat-thread-btn:hover { background: rgba(30, 41, 59, 0.65); }
+    .chat-thread-btn.active {
+      background: rgba(99, 102, 241, 0.18);
+      border-color: rgba(99, 102, 241, 0.45);
+    }
+
+    .chat-main {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(6, 8, 15, 0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .chat-feed {
+      flex: 1;
+      padding: 1rem 1.2rem;
+      overflow-y: auto;
+      max-height: 410px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .chat-msg {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 0.65rem 0.9rem;
+      max-width: 82%;
+      align-self: flex-start;
+    }
+    .chat-msg.mine {
+      background: rgba(99, 102, 241, 0.18);
+      border-color: rgba(99, 102, 241, 0.38);
+      align-self: flex-end;
+    }
+
+    .chat-input-bar {
+      padding: 0.85rem 1rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      gap: 0.6rem;
+      background: rgba(6, 8, 15, 0.55);
     }
 
     /* Modals */
@@ -406,7 +608,7 @@
     }
 
     .modal-box.admin-modal-box {
-      max-width: 860px;
+      max-width: 1040px;
     }
 
     .modal-header {
@@ -451,7 +653,7 @@
     }
 
     .form-group label {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -462,10 +664,10 @@
       background: var(--bg-void);
       border: 1px solid var(--border-subtle);
       border-radius: 10px;
-      padding: 0.65rem 0.9rem;
+      padding: 0.62rem 0.9rem;
       color: #fff;
       font-family: var(--font-sans);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       outline: none;
       width: 100%;
     }
@@ -541,10 +743,9 @@
       opacity: 0.55;
     }
 
-    /* Admin Table */
-    .codes-table-wrap {
+    /* Tables */
+    .table-wrap {
       overflow-x: auto;
-      margin-top: 1rem;
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
     }
@@ -577,7 +778,36 @@
       border-radius: 6px;
       font-weight: 700;
       border: 1px solid rgba(99, 102, 241, 0.35);
+      cursor: pointer;
     }
+
+    .admin-subtabs {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.15rem;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.75rem;
+    }
+
+    .admin-subtab {
+      background: var(--bg-void);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 0.48rem 0.9rem;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .admin-subtab.active {
+      background: var(--accent-rose);
+      border-color: var(--accent-rose);
+      color: #fff;
+    }
+
+    .admin-pane { display: none; }
+    .admin-pane.active { display: block; }
 
     /* Toast */
     .toast-container {
@@ -612,51 +842,184 @@
 
   <!-- TOP NAVIGATION -->
   <header class="navbar">
-    <a href="#" class="brand" onclick="closeAllModals(); return false;">
-      <div class="brand-icon">⚡</div>
-      <div class="brand-text">ARCADE NEXUS</div>
-    </a>
+    <div class="nav-left">
+      <a href="#" class="brand" onclick="switchMainTab('games'); closeAllModals(); return false;">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">ARCADE NEXUS</div>
+      </a>
+
+      <nav class="main-nav-tabs" aria-label="Main Navigation">
+        <button class="main-tab active" data-view="games" onclick="switchMainTab('games')">🎮 Games</button>
+        <button class="main-tab" data-view="leaderboards" onclick="switchMainTab('leaderboards')">🏆 Leaderboards</button>
+        <button class="main-tab" data-view="shop" onclick="switchMainTab('shop')">🛒 Shop</button>
+        <button class="main-tab" data-view="friends" onclick="switchMainTab('friends')">👥 Friends <span class="tab-badge" id="onlineFriendsBadge" style="display:none;">0</span></button>
+        <button class="main-tab" data-view="messages" onclick="switchMainTab('messages')">💬 Messages <span class="tab-badge" id="unreadMessagesBadge" style="display:none;">0</span></button>
+      </nav>
+    </div>
 
     <div class="nav-actions">
       <div class="hud-pill hud-coin" title="Arcade Coins">🪙 <span id="hudCoins">500</span></div>
       <div class="hud-pill hud-gem" title="Nexus Gems">💎 <span id="hudGems">10</span></div>
+
+      <div class="presence-pill" title="Online Status Mode">
+        <span class="status-dot online" id="navPresenceDot"></span>
+        <select id="presenceModeSelect" class="presence-select" onchange="setPresenceMode(this.value)">
+          <option value="automatic">Automatic</option>
+          <option value="online">Online</option>
+          <option value="offline">Offline</option>
+        </select>
+      </div>
+
       <button class="btn btn-ghost" id="soundToggleBtn" onclick="toggleSound()">🔊 SFX</button>
       <button class="btn btn-redeem" onclick="openModal('redeemModal')">🎟️ Redeem Code</button>
-      <button class="btn btn-admin" id="adminNavBtn" style="display:none;" onclick="openAdminModal()">🛡️ Admin Panel</button>
+      <button class="btn btn-admin" id="adminNavBtn" style="display:none;" onclick="openAdminModal()">🛡️ Admin</button>
       <button class="btn btn-primary" id="authNavBtn" onclick="openModal('authModal')">👤 Sign In</button>
     </div>
   </header>
 
-  <!-- HERO & FILTER BAR -->
-  <section class="hero">
-    <div class="hero-banner">
-      <div>
-        <h1 class="hero-title">Next-Gen Browser <span>Arcade Vault</span></h1>
-        <p class="hero-sub">18 handcrafted high-FPS games with cloud account sync, unlockable custom skins, powerups, and live promo code rewards.</p>
-      </div>
-      <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
-        <button class="btn btn-redeem" onclick="openModal('redeemModal')">🎁 Enter Promo Code</button>
-        <button class="btn btn-ghost" onclick="openModal('lockerModal')">🎨 Skins & Powerups Locker</button>
-      </div>
-    </div>
+  <!-- MAIN PAGE CONTENT -->
+  <div class="page-container">
 
-    <div class="controls-bar">
-      <div class="category-tabs" id="categoryTabs">
-        <button class="cat-tab active" data-cat="all">All Games (18)</button>
-        <button class="cat-tab" data-cat="clicker">Idle & Clicker</button>
-        <button class="cat-tab" data-cat="racing">Racing & Action</button>
-        <button class="cat-tab" data-cat="arcade">Classic Arcade</button>
-        <button class="cat-tab" data-cat="puzzle">Puzzle & Board</button>
-        <button class="cat-tab" data-cat="reflex">Reflex & Skill</button>
+    <!-- VIEW 1: GAMES LIBRARY -->
+    <section class="view-section active" id="view-games">
+      <div class="controls-bar">
+        <div class="category-tabs" id="categoryTabs">
+          <button class="cat-tab active" data-cat="all">All Games (18)</button>
+          <button class="cat-tab" data-cat="clicker">Idle & Clicker</button>
+          <button class="cat-tab" data-cat="racing">Racing & Action</button>
+          <button class="cat-tab" data-cat="arcade">Classic Arcade</button>
+          <button class="cat-tab" data-cat="puzzle">Puzzle & Board</button>
+          <button class="cat-tab" data-cat="reflex">Reflex & Skill</button>
+        </div>
+        <div class="search-box">
+          <input type="text" id="gameSearchInput" placeholder="Search 18 games..." oninput="renderGameGrid()" />
+        </div>
       </div>
-      <div class="search-box">
-        <input type="text" id="gameSearchInput" placeholder="Search 18 games..." oninput="renderGameGrid()" />
-      </div>
-    </div>
-  </section>
 
-  <!-- GAME GRID -->
-  <main class="game-grid" id="gameGrid"></main>
+      <main class="game-grid" id="gameGrid"></main>
+    </section>
+
+    <!-- VIEW 2: LEADERBOARDS (PER GAME + OVERALL) -->
+    <section class="view-section" id="view-leaderboards">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">🏆 Game Leaderboards</h2>
+          <p class="section-sub">High scores across all 18 games and top coin collectors.</p>
+        </div>
+        <div style="display:flex; gap:0.65rem; align-items:center; flex-wrap:wrap;">
+          <select id="leaderboardGameSelect" class="form-control" style="min-width:240px;" onchange="renderLeaderboardView()"></select>
+          <button class="btn btn-primary" id="playFromLeaderboardBtn" onclick="launchSelectedLeaderboardGame()">▶ Play Game</button>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <div id="leaderboardGameBanner" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.75rem;"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:70px;">Rank</th>
+                <th>Player</th>
+                <th>Status</th>
+                <th>Member</th>
+                <th style="text-align:right;">Score</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: SHOP (SKINS & POWERUPS) -->
+    <section class="view-section" id="view-shop">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">🛒 Arcade Shop & Locker</h2>
+          <p class="section-sub">Unlock permanent powerups and custom skins using Arcade Coins or Redeem Codes.</p>
+        </div>
+        <button class="btn btn-redeem" onclick="openModal('redeemModal')">🎟️ Redeem Code</button>
+      </div>
+
+      <h3 style="margin-bottom:0.75rem; color:var(--accent-cyan); font-size:1.05rem;">⚡ Global & Game Powerups</h3>
+      <div id="shopPowerupsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:0.85rem; margin-bottom:1.75rem;"></div>
+
+      <h3 style="margin-bottom:0.75rem; color:var(--accent-amber); font-size:1.05rem;">✨ Custom Game Skins</h3>
+      <div id="shopSkinsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:0.85rem;"></div>
+    </section>
+
+    <!-- VIEW 4: FRIENDS & FRIEND CODES -->
+    <section class="view-section" id="view-friends">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">👥 Friends & Social</h2>
+          <p class="section-sub">Share your Friend Code, add friends, and see who is currently online.</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:1.5rem;">
+        <!-- Your Friend Code Card -->
+        <div class="panel-card">
+          <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Your Friend Code</div>
+          <div style="display:flex; align-items:center; gap:0.75rem; margin-top:0.6rem; flex-wrap:wrap;">
+            <span id="myFriendCodeDisplay" style="font-family:var(--font-mono); font-size:1.45rem; font-weight:900; color:var(--accent-cyan); background:var(--bg-void); padding:0.45rem 0.9rem; border-radius:10px; border:1px solid var(--border-subtle); letter-spacing:0.08em;">NX-000000</span>
+            <button class="btn btn-primary" onclick="copyMyFriendCode()">📋 Copy</button>
+            <button class="btn btn-ghost" onclick="regenerateFriendCode()">↻ Regenerate</button>
+          </div>
+          <div id="myPlayerSinceCardText" style="margin-top:0.75rem; font-size:0.82rem; color:var(--text-muted);">Player since --/--/--</div>
+        </div>
+
+        <!-- Add Friend Card -->
+        <div class="panel-card">
+          <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Add Friend by Code</div>
+          <div style="display:flex; gap:0.6rem; margin-top:0.6rem;">
+            <input type="text" id="addFriendCodeInput" class="form-control" placeholder="Enter friend code (e.g. NX-84K2P9)" style="font-family:var(--font-mono); text-transform:uppercase;" />
+            <button class="btn btn-emerald" onclick="addFriendByCode()">➕ Add</button>
+          </div>
+          <div style="margin-top:0.75rem; font-size:0.8rem; color:var(--text-muted);">
+            Tip: Regenerating your code immediately retires your old code so only players with your active code can add you.
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:0.85rem; font-size:1.05rem;">Your Friends (<span id="friendsCountLabel">0</span>)</h3>
+      <div class="friends-grid" id="friendsListGrid"></div>
+    </section>
+
+    <!-- VIEW 5: MESSAGES (PLAYER-TO-PLAYER CHAT) -->
+    <section class="view-section" id="view-messages">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">💬 Messages</h2>
+          <p class="section-sub">Chat in the Global Arcade Lounge or send direct messages to your friends.</p>
+        </div>
+      </div>
+
+      <div class="messages-layout">
+        <div class="chat-sidebar" id="chatThreadsSidebar"></div>
+
+        <div class="chat-main">
+          <div class="chat-header">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <span class="status-dot online" id="activeChatDot"></span>
+              <div>
+                <div id="activeChatTitle" style="font-weight:800; font-size:1rem;">🌐 Global Arcade Lounge</div>
+                <div id="activeChatSub" style="font-size:0.76rem; color:var(--text-muted);">Public chat for all online players</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-feed" id="chatMessagesFeed"></div>
+
+          <div class="chat-input-bar">
+            <input type="text" id="chatMessageInput" class="form-control" placeholder="Write a message..." onkeydown="if(event.key==='Enter') sendChatMessage()" />
+            <button class="btn btn-primary" onclick="sendChatMessage()">Send ➤</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
 
   <!-- GAME PLAY MODAL -->
   <div class="modal-backdrop" id="gameModal">
@@ -666,7 +1029,8 @@
           <span id="activeGameIcon">🎮</span>
           <span id="activeGameTitle">Game Title</span>
         </div>
-        <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:0.55rem; flex-wrap:wrap;">
+          <button class="btn btn-ghost" style="padding:0.4rem 0.75rem; font-size:0.8rem;" onclick="openGameLeaderboardShortcut()">🏆 Leaderboard</button>
           <button class="btn btn-redeem" style="padding:0.4rem 0.75rem; font-size:0.8rem;" onclick="openModal('redeemModal')">🎟️ Redeem Code</button>
           <button class="btn btn-ghost" style="padding:0.4rem 0.75rem; font-size:0.8rem;" onclick="restartActiveGame()">↻ Restart</button>
           <button class="close-btn" onclick="closeGameModal()">✕</button>
@@ -692,43 +1056,23 @@
   <div class="modal-backdrop" id="redeemModal">
     <div class="modal-box">
       <div class="modal-header">
-        <div class="modal-title">🎟️ Redeem Reward Code</div>
+        <div class="modal-title">🎟️ Redeem Code</div>
         <button class="close-btn" onclick="closeModal('redeemModal')">✕</button>
       </div>
-      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">
-        Enter a promo or creator code to unlock exclusive game skins, coins, gems, or permanent powerups across the arcade.
-      </p>
       <div class="form-group">
-        <label>Promo Code</label>
-        <input type="text" id="redeemCodeInput" class="form-control" placeholder="e.g. NEXUS2026" style="font-family:var(--font-mono); text-transform:uppercase; font-size:1.1rem; letter-spacing:0.08em;" />
+        <label>Code</label>
+        <input type="text" id="redeemCodeInput" class="form-control" placeholder="Enter code" style="font-family:var(--font-mono); text-transform:uppercase; font-size:1.05rem; letter-spacing:0.08em;" onkeydown="if(event.key==='Enter') handleRedeemCode()" />
       </div>
-      <button class="btn btn-redeem" style="width:100%; justify-content:center; padding:0.75rem; font-size:1rem;" onclick="handleRedeemCode()">
-        ⚡ Claim Reward Now
+      <button class="btn btn-redeem" style="width:100%; justify-content:center; padding:0.72rem; font-size:0.98rem;" onclick="handleRedeemCode()">
+        Redeem Code
       </button>
-      <div style="margin-top:1.1rem; padding-top:0.9rem; border-top:1px solid var(--border-subtle); font-size:0.8rem; color:var(--text-muted);">
-        Starter starter code to test right away: <span class="code-badge">WELCOME500</span>
+      <div id="starterCodeHint" style="margin-top:1.05rem; padding-top:0.85rem; border-top:1px solid var(--border-subtle); font-size:0.84rem; color:var(--text-muted);">
+        Get started with this code: <button type="button" class="code-badge" onclick="fillStarterCode()">WELCOME500</button>
       </div>
     </div>
   </div>
 
-  <!-- LOCKER (SKINS & POWERUPS) MODAL -->
-  <div class="modal-backdrop" id="lockerModal">
-    <div class="modal-box admin-modal-box">
-      <div class="modal-header">
-        <div class="modal-title">🎨 Skins & Powerups Locker</div>
-        <button class="close-btn" onclick="closeModal('lockerModal')">✕</button>
-      </div>
-      <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1rem;">
-        Unlock skins and boosts using earned Arcade Coins or exclusive Redeem Codes!
-      </p>
-      <h4 style="margin-bottom:0.6rem; color:var(--accent-cyan);">⚡ Global & Game Powerups</h4>
-      <div id="lockerPowerupsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:0.75rem; margin-bottom:1.4rem;"></div>
-      <h4 style="margin-bottom:0.6rem; color:var(--accent-amber);">✨ Custom Game Skins</h4>
-      <div id="lockerSkinsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:0.75rem;"></div>
-    </div>
-  </div>
-
-  <!-- AUTH MODAL -->
+  <!-- AUTH / PLAYER ACCOUNT MODAL -->
   <div class="modal-backdrop" id="authModal">
     <div class="modal-box">
       <div class="modal-header">
@@ -738,8 +1082,12 @@
 
       <div id="signedOutView">
         <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1rem;">
-          Sign in to sync your coins, unlocked skins, high scores, and redeemed codes across devices.
+          Sign in to sync your coins, skins, high scores, friend code, and messages across devices.
         </p>
+        <div class="form-group">
+          <label>Display Name (Optional for Sign Up)</label>
+          <input type="text" id="authDisplayName" class="form-control" placeholder="e.g. CyberAce" />
+        </div>
         <div class="form-group">
           <label>Email</label>
           <input type="email" id="authEmail" class="form-control" placeholder="player@example.com" />
@@ -760,10 +1108,28 @@
 
       <div id="signedInView" style="display:none;">
         <div style="background:var(--bg-void); padding:1rem; border-radius:12px; border:1px solid var(--border-subtle); margin-bottom:1rem;">
-          <div style="font-size:0.8rem; color:var(--text-muted);">SIGNED IN AS</div>
-          <div id="userEmailDisplay" style="font-weight:800; font-size:1.05rem; margin-top:0.2rem;"></div>
-          <div id="userRoleBadge" style="margin-top:0.4rem; display:inline-block; font-size:0.75rem; padding:0.2rem 0.6rem; border-radius:999px; background:rgba(16,185,129,0.18); color:#34d399; font-weight:700;">PLAYER</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
+            <div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">SIGNED IN AS</div>
+              <div id="userEmailDisplay" style="font-weight:800; font-size:1.05rem; margin-top:0.15rem;"></div>
+            </div>
+            <span id="userRoleBadge" style="font-size:0.74rem; padding:0.22rem 0.6rem; border-radius:999px; background:rgba(16,185,129,0.18); color:#34d399; font-weight:700;">PLAYER</span>
+          </div>
+
+          <div style="margin-top:0.85rem; padding-top:0.75rem; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; font-size:0.82rem;">
+            <span id="accountPlayerSince" style="color:var(--text-muted);">Player since --/--/--</span>
+            <span>Friend Code: <strong id="accountFriendCode" style="font-family:var(--font-mono); color:var(--accent-cyan);"></strong></span>
+          </div>
         </div>
+
+        <div class="form-group">
+          <label>Nickname</label>
+          <div style="display:flex; gap:0.5rem;">
+            <input type="text" id="profileNicknameInput" class="form-control" placeholder="Your arcade nickname" />
+            <button class="btn btn-primary" onclick="updateNickname()">Save</button>
+          </div>
+        </div>
+
         <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="signOutUser()">Sign Out</button>
       </div>
     </div>
@@ -773,91 +1139,186 @@
   <div class="modal-backdrop" id="adminModal">
     <div class="modal-box admin-modal-box">
       <div class="modal-header">
-        <div class="modal-title">🛡️ Owner Admin Dashboard — Code Generator</div>
+        <div class="modal-title">🛡️ Owner Admin Control Center</div>
         <button class="close-btn" onclick="closeModal('adminModal')">✕</button>
       </div>
 
-      <div style="background:var(--bg-void); border:1px solid var(--border-subtle); border-radius:14px; padding:1.15rem; margin-bottom:1.25rem;">
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Custom Code (or Click Randomize)</label>
-            <div style="display:flex; gap:0.5rem;">
-              <input type="text" id="adminCodeString" class="form-control" placeholder="e.g. MEGA999" style="font-family:var(--font-mono); text-transform:uppercase; font-weight:700;" />
-              <button class="btn btn-primary" type="button" onclick="randomizeAdminCode()" title="Generate Random Code">🎲 Random</button>
+      <div class="admin-subtabs">
+        <button class="admin-subtab active" data-pane="players" onclick="switchAdminPane('players')">👥 Players & Balances</button>
+        <button class="admin-subtab" data-pane="logs" onclick="switchAdminPane('logs')">📜 Player Action Logs</button>
+        <button class="admin-subtab" data-pane="codes" onclick="switchAdminPane('codes')">🎟️ Redeem Codes</button>
+        <button class="admin-subtab" data-pane="moderation" onclick="switchAdminPane('moderation')">⚖️ Scores & Chat Control</button>
+      </div>
+
+      <!-- ADMIN PANE 1: PLAYERS & BALANCES -->
+      <div class="admin-pane active" id="admin-pane-players">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; margin-bottom:0.85rem; flex-wrap:wrap;">
+          <input type="text" id="adminPlayerSearch" class="form-control" style="max-width:320px;" placeholder="Filter players by name, email, or friend code..." oninput="renderAdminPlayersTable()" />
+          <button class="btn btn-ghost" onclick="refreshAdminData()">↻ Refresh Cloud Data</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Status</th>
+                <th>Player Since</th>
+                <th>Friend Code</th>
+                <th>🪙 Coins</th>
+                <th>💎 Gems</th>
+                <th>Admin Controls</th>
+              </tr>
+            </thead>
+            <tbody id="adminPlayersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN PANE 2: FULL PLAYER ACTION & REDEMPTION LOG -->
+      <div class="admin-pane" id="admin-pane-logs">
+        <div style="display:flex; gap:0.65rem; margin-bottom:0.85rem; flex-wrap:wrap;">
+          <select id="adminLogPlayerFilter" class="form-control" style="max-width:250px;" onchange="renderAdminLogsTable()">
+            <option value="all">All Players</option>
+          </select>
+          <select id="adminLogTypeFilter" class="form-control" style="max-width:220px;" onchange="renderAdminLogsTable()">
+            <option value="all">All Action Types</option>
+            <option value="REDEEM">🎟️ Code Redemptions</option>
+            <option value="SCORE">🏆 High Scores</option>
+            <option value="SHOP">🛒 Shop Purchases</option>
+            <option value="FRIEND">👥 Friend & Code Events</option>
+            <option value="CHAT">💬 Chat Messages</option>
+            <option value="PRESENCE">🟢 Status / Account</option>
+            <option value="ADMIN">🛡️ Admin Actions</option>
+          </select>
+          <button class="btn btn-ghost" onclick="refreshAdminData()">↻ Refresh Logs</button>
+        </div>
+
+        <div class="table-wrap" style="max-height:430px; overflow-y:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Player</th>
+                <th>Category</th>
+                <th>Action Details</th>
+              </tr>
+            </thead>
+            <tbody id="adminLogsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN PANE 3: REDEEM CODES MANAGER -->
+      <div class="admin-pane" id="admin-pane-codes">
+        <div style="background:var(--bg-void); border:1px solid var(--border-subtle); border-radius:14px; padding:1.15rem; margin-bottom:1.25rem;">
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Custom Code (or Click Randomize)</label>
+              <div style="display:flex; gap:0.5rem;">
+                <input type="text" id="adminCodeString" class="form-control" placeholder="e.g. MEGA999" style="font-family:var(--font-mono); text-transform:uppercase; font-weight:700;" />
+                <button class="btn btn-primary" type="button" onclick="randomizeAdminCode()" title="Generate Random Code">🎲 Random</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Target Game</label>
+              <select id="adminTargetGame" class="form-control">
+                <option value="all">🌐 All Games (Global Reward)</option>
+              </select>
             </div>
           </div>
 
-          <div class="form-group">
-            <label>Target Game</label>
-            <select id="adminTargetGame" class="form-control">
-              <option value="all">🌐 All Games (Global Reward)</option>
-            </select>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Reward Type</label>
+              <select id="adminRewardType" class="form-control" onchange="updateAdminRewardInputs()">
+                <option value="coins">🪙 Arcade Coins</option>
+                <option value="gems">💎 Nexus Gems</option>
+                <option value="skin">🎨 Unlock Specific Skin</option>
+                <option value="all_skins">👑 Unlock ALL Skins (Every Game)</option>
+                <option value="powerup">⚡ Unlock Powerup / Upgrade</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="adminAmountGroup">
+              <label id="adminAmountLabel">Coin Amount</label>
+              <input type="number" id="adminRewardAmount" class="form-control" value="2500" min="1" />
+            </div>
+
+            <div class="form-group" id="adminSkinGroup" style="display:none;">
+              <label>Select Skin to Unlock</label>
+              <select id="adminSkinSelect" class="form-control"></select>
+            </div>
+
+            <div class="form-group" id="adminPowerupGroup" style="display:none;">
+              <label>Select Powerup / Upgrade</label>
+              <select id="adminPowerupSelect" class="form-control"></select>
+            </div>
           </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Max Total Uses (0 = Unlimited)</label>
+              <input type="number" id="adminMaxUses" class="form-control" value="0" min="0" />
+            </div>
+            <div class="form-group">
+              <label>Internal Note (Optional)</label>
+              <input type="text" id="adminCodeNote" class="form-control" placeholder="e.g. Weekend Drop" />
+            </div>
+          </div>
+
+          <button class="btn btn-admin" style="width:100%; justify-content:center; padding:0.75rem; font-size:0.95rem;" onclick="createAdminCode()">
+            ✨ Publish Live Redeem Code
+          </button>
         </div>
 
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.65rem;">
+          <h4 style="font-size:0.95rem;">Active & Created Codes</h4>
+          <span id="adminCodesCount" style="font-size:0.8rem; color:var(--text-muted);">0 codes</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Game</th>
+                <th>Reward</th>
+                <th>Uses</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminCodesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN PANE 4: LEADERBOARD & CHAT MODERATION -->
+      <div class="admin-pane" id="admin-pane-moderation">
         <div class="grid-2">
-          <div class="form-group">
-            <label>Reward Type</label>
-            <select id="adminRewardType" class="form-control" onchange="updateAdminRewardInputs()">
-              <option value="coins">🪙 Arcade Coins</option>
-              <option value="gems">💎 Nexus Gems</option>
-              <option value="skin">🎨 Unlock Specific Skin</option>
-              <option value="all_skins">👑 Unlock ALL Skins (Every Game)</option>
-              <option value="powerup">⚡ Unlock Powerup / Upgrade</option>
-            </select>
+          <div class="panel-card" style="background:var(--bg-void);">
+            <h4 style="margin-bottom:0.5rem;">💬 Global & Direct Chat Moderation</h4>
+            <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.85rem;">Inspect recent chat messages across the arcade and delete any message.</p>
+            <div id="adminChatModList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:320px; overflow-y:auto;"></div>
           </div>
 
-          <div class="form-group" id="adminAmountGroup">
-            <label id="adminAmountLabel">Coin / Gem Amount</label>
-            <input type="number" id="adminRewardAmount" class="form-control" value="2500" min="1" />
-          </div>
-
-          <div class="form-group" id="adminSkinGroup" style="display:none;">
-            <label>Select Skin to Unlock</label>
-            <select id="adminSkinSelect" class="form-control"></select>
-          </div>
-
-          <div class="form-group" id="adminPowerupGroup" style="display:none;">
-            <label>Select Powerup / Upgrade</label>
-            <select id="adminPowerupSelect" class="form-control"></select>
+          <div class="panel-card" style="background:var(--bg-void);">
+            <h4 style="margin-bottom:0.5rem;">🏆 Reset Player Game Score</h4>
+            <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.85rem;">Select a player and game to reset their leaderboard entry.</p>
+            <div class="form-group">
+              <label>Player</label>
+              <select id="adminModPlayerSelect" class="form-control"></select>
+            </div>
+            <div class="form-group">
+              <label>Game</label>
+              <select id="adminModGameSelect" class="form-control"></select>
+            </div>
+            <button class="btn btn-admin" style="width:100%; justify-content:center;" onclick="adminResetPlayerScore()">Reset Score to 0</button>
           </div>
         </div>
-
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Max Total Uses (0 = Unlimited)</label>
-            <input type="number" id="adminMaxUses" class="form-control" value="0" min="0" />
-          </div>
-          <div class="form-group">
-            <label>Internal Note (Optional)</label>
-            <input type="text" id="adminCodeNote" class="form-control" placeholder="e.g. Weekend Drop" />
-          </div>
-        </div>
-
-        <button class="btn btn-admin" style="width:100%; justify-content:center; padding:0.75rem; font-size:0.95rem;" onclick="createAdminCode()">
-          ✨ Publish Live Redeem Code
-        </button>
       </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h4 style="font-size:0.95rem;">Active & Created Codes</h4>
-        <span id="adminCodesCount" style="font-size:0.8rem; color:var(--text-muted);">0 codes</span>
-      </div>
-
-      <div class="codes-table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Code</th>
-              <th>Game</th>
-              <th>Reward</th>
-              <th>Uses</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="adminCodesTableBody"></tbody>
-        </table>
-      </div>
     </div>
   </div>
 
@@ -882,16 +1343,22 @@
       getDoc,
       setDoc,
       updateDoc,
+      addDoc,
       collection,
       getDocs,
       deleteDoc,
-      increment
+      increment,
+      query,
+      where,
+      orderBy,
+      limit,
+      onSnapshot
     } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
     // =========================================================================
-    // 1. FIREBASE CONFIGURATION (PASTE YOUR FIREBASE PROJECT CONFIG BELOW)
+    // 1. FIREBASE CONFIGURATION
     // =========================================================================
-const FIREBASE_CONFIG = {
+    const FIREBASE_CONFIG = {
       apiKey: "AIzaSyAEW3SDW4Zz5gYIkN1zF0MNawxBu69H4k4",
       authDomain: "arcade--nexus.firebaseapp.com",
       projectId: "arcade--nexus",
@@ -900,7 +1367,6 @@ const FIREBASE_CONFIG = {
       appId: "1:257930347387:web:42104a72369fb64bb933de"
     };
 
-    // Replace with the email address you will sign in with as Owner:
     const ADMIN_EMAILS = [
       "ibrahim.rayees2@gmail.com"
     ];
@@ -981,28 +1447,70 @@ const FIREBASE_CONFIG = {
     ];
 
     // =========================================================================
-    // 3. STATE MANAGEMENT (CLOUD FIRESTORE + LOCAL STORAGE FALLBACK)
+    // 3. HELPERS: DATES, FRIEND CODES, ONLINE STATUS
     // =========================================================================
-    const DEFAULT_PROFILE = {
-      coins: 500,
-      gems: 10,
-      unlockedSkins: [
-        "cookie_classic", "car_red", "rally_blue", "snake_emerald",
-        "ship_cobalt", "bird_cyan", "paddle_indigo"
-      ],
-      equippedSkins: {
-        cookie: "cookie_classic",
-        drift: "car_red",
-        rally: "rally_blue",
-        snake: "snake_emerald",
-        invaders: "ship_cobalt",
-        flappy: "bird_cyan",
-        breakout: "paddle_indigo"
-      },
-      powerups: [],
-      redeemedCodes: [],
-      highScores: {}
-    };
+    function formatMMDDYY(ts) {
+      const d = ts ? new Date(ts) : new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${mm}/${dd}/${yy}`;
+    }
+
+    function generateFriendCodeString() {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let code = "NX-";
+      for (let i = 0; i < 6; i++) {
+        code += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return code;
+    }
+
+    function computeIsPlayerOnline(playerObj) {
+      if (!playerObj) return false;
+      const mode = playerObj.presenceMode || "automatic";
+      if (mode === "online") return true;
+      if (mode === "offline") return false;
+      // Automatic: check if lastActive was within the past 2.5 minutes
+      const last = Number(playerObj.lastActive || 0);
+      return (Date.now() - last) < 150000;
+    }
+
+    // =========================================================================
+    // 4. STATE MANAGEMENT (CLOUD FIRESTORE + LOCAL STORAGE FALLBACK)
+    // =========================================================================
+    function createDefaultProfile() {
+      const now = Date.now();
+      return {
+        uid: "local_player",
+        email: "",
+        displayName: "Guest Player",
+        playerSince: formatMMDDYY(now),
+        createdAt: now,
+        friendCode: generateFriendCodeString(),
+        friends: [],
+        presenceMode: "automatic",
+        lastActive: now,
+        coins: 500,
+        gems: 10,
+        unlockedSkins: [
+          "cookie_classic", "car_red", "rally_blue", "snake_emerald",
+          "ship_cobalt", "bird_cyan", "paddle_indigo"
+        ],
+        equippedSkins: {
+          cookie: "cookie_classic",
+          drift: "car_red",
+          rally: "rally_blue",
+          snake: "snake_emerald",
+          invaders: "ship_cobalt",
+          flappy: "bird_cyan",
+          breakout: "paddle_indigo"
+        },
+        powerups: [],
+        redeemedCodes: [],
+        highScores: {}
+      };
+    }
 
     const DEFAULT_CODES = [
       {
@@ -1022,28 +1530,48 @@ const FIREBASE_CONFIG = {
     let currentUser = null;
     let userProfile = loadLocalProfile();
     let localCodes = loadLocalCodes();
+    let allPlayersCache = [];
+    let allLogsCache = [];
+    let chatMessagesCache = [];
+    let activeChatThread = "global"; // "global" or friend's uid
     let soundEnabled = true;
     let activeCategory = "all";
     let activeGameId = null;
     let activeGameCleanup = null;
+    let unsubChat = null;
 
     function loadLocalProfile() {
       try {
-        const raw = localStorage.getItem("arcade_nexus_profile_v1");
-        if (raw) return { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
+        const raw = localStorage.getItem("arcade_nexus_profile_v2");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const base = createDefaultProfile();
+          return {
+            ...base,
+            ...parsed,
+            playerSince: parsed.playerSince || formatMMDDYY(parsed.createdAt || Date.now()),
+            friendCode: parsed.friendCode || generateFriendCodeString(),
+            friends: Array.isArray(parsed.friends) ? parsed.friends : [],
+            presenceMode: parsed.presenceMode || "automatic",
+            equippedSkins: { ...base.equippedSkins, ...(parsed.equippedSkins || {}) },
+            highScores: { ...base.highScores, ...(parsed.highScores || {}) }
+          };
+        }
       } catch (e) {}
-      return JSON.parse(JSON.stringify(DEFAULT_PROFILE));
+      const fresh = createDefaultProfile();
+      saveLocalProfile(fresh);
+      return fresh;
     }
 
-    function saveLocalProfile() {
+    function saveLocalProfile(prof = userProfile) {
       try {
-        localStorage.setItem("arcade_nexus_profile_v1", JSON.stringify(userProfile));
+        localStorage.setItem("arcade_nexus_profile_v2", JSON.stringify(prof));
       } catch (e) {}
     }
 
     function loadLocalCodes() {
       try {
-        const raw = localStorage.getItem("arcade_nexus_codes_v1");
+        const raw = localStorage.getItem("arcade_nexus_codes_v2");
         if (raw) return JSON.parse(raw);
       } catch (e) {}
       return JSON.parse(JSON.stringify(DEFAULT_CODES));
@@ -1051,13 +1579,45 @@ const FIREBASE_CONFIG = {
 
     function saveLocalCodes() {
       try {
-        localStorage.setItem("arcade_nexus_codes_v1", JSON.stringify(localCodes));
+        localStorage.setItem("arcade_nexus_codes_v2", JSON.stringify(localCodes));
       } catch (e) {}
     }
 
+    function loadLocalLogs() {
+      try {
+        return JSON.parse(localStorage.getItem("arcade_nexus_logs_v2") || "[]");
+      } catch (e) { return []; }
+    }
+
+    function saveLocalLogs(logs) {
+      try {
+        localStorage.setItem("arcade_nexus_logs_v2", JSON.stringify(logs.slice(0, 500)));
+      } catch (e) {}
+    }
+
+    function loadLocalMessages() {
+      try {
+        return JSON.parse(localStorage.getItem("arcade_nexus_messages_v2") || "[]");
+      } catch (e) { return []; }
+    }
+
+    function saveLocalMessages(msgs) {
+      try {
+        localStorage.setItem("arcade_nexus_messages_v2", JSON.stringify(msgs.slice(-300)));
+      } catch (e) {}
+    }
+
+    function getEffectiveLastActive() {
+      if (userProfile.presenceMode === "offline") return 0;
+      if (userProfile.presenceMode === "online") return Date.now();
+      return document.visibilityState === "visible" ? Date.now() : 0;
+    }
+
     async function syncProfileToCloud() {
+      userProfile.lastActive = getEffectiveLastActive();
       saveLocalProfile();
       updateHud();
+      updatePresenceUI();
       if (db && currentUser) {
         try {
           await setDoc(doc(db, "users", currentUser.uid), userProfile, { merge: true });
@@ -1073,25 +1633,71 @@ const FIREBASE_CONFIG = {
         const snap = await getDoc(doc(db, "users", user.uid));
         if (snap.exists()) {
           const cloudData = snap.data();
+          const base = createDefaultProfile();
           userProfile = {
-            ...DEFAULT_PROFILE,
+            ...base,
             ...cloudData,
-            equippedSkins: { ...DEFAULT_PROFILE.equippedSkins, ...(cloudData.equippedSkins || {}) },
-            highScores: { ...DEFAULT_PROFILE.highScores, ...(cloudData.highScores || {}) }
+            uid: user.uid,
+            email: user.email || cloudData.email || "",
+            displayName: cloudData.displayName || user.displayName || (user.email ? user.email.split("@")[0] : "Player"),
+            playerSince: cloudData.playerSince || formatMMDDYY(cloudData.createdAt || Date.now()),
+            friendCode: cloudData.friendCode || generateFriendCodeString(),
+            friends: Array.isArray(cloudData.friends) ? cloudData.friends : [],
+            presenceMode: cloudData.presenceMode || "automatic",
+            equippedSkins: { ...base.equippedSkins, ...(cloudData.equippedSkins || {}) },
+            highScores: { ...base.highScores, ...(cloudData.highScores || {}) }
           };
-          saveLocalProfile();
         } else {
-          await setDoc(doc(db, "users", user.uid), userProfile);
+          const now = Date.now();
+          userProfile.uid = user.uid;
+          userProfile.email = user.email || "";
+          userProfile.displayName = user.displayName || (user.email ? user.email.split("@")[0] : "Player");
+          userProfile.createdAt = now;
+          userProfile.playerSince = formatMMDDYY(now);
+          userProfile.friendCode = userProfile.friendCode || generateFriendCodeString();
+          await logPlayerAction("PRESENCE", "Created new cloud player account");
         }
+        await syncProfileToCloud();
       } catch (err) {
         console.warn("Could not read cloud profile:", err.message);
       }
       updateHud();
+      updateAuthUI();
       renderGameGrid();
+      await fetchAllPlayers();
+      renderFriendsView();
+      renderLeaderboardView();
+      renderChatThreads();
     }
 
     // =========================================================================
-    // 4. WEB AUDIO SYNTHESIZER (ZERO EXTERNAL ASSETS NEEDED)
+    // 5. ACTION & AUDIT LOGGER (FOR OWNER ADMIN DASHBOARD)
+    // =========================================================================
+    async function logPlayerAction(category, detail) {
+      const entry = {
+        id: "log_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        uid: currentUser ? currentUser.uid : userProfile.uid,
+        playerEmail: currentUser ? currentUser.email : (userProfile.email || "guest@local"),
+        playerName: userProfile.displayName || "Guest Player",
+        category,
+        detail,
+        timestamp: Date.now()
+      };
+
+      const logs = loadLocalLogs();
+      logs.unshift(entry);
+      saveLocalLogs(logs);
+      allLogsCache = logs;
+
+      if (db && currentUser) {
+        try {
+          await addDoc(collection(db, "activity_logs"), entry);
+        } catch (e) {}
+      }
+    }
+
+    // =========================================================================
+    // 6. WEB AUDIO SYNTHESIZER
     // =========================================================================
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
@@ -1168,7 +1774,7 @@ const FIREBASE_CONFIG = {
     };
 
     // =========================================================================
-    // 5. SHARED GAME API (COINS, HIGH SCORES, SKINS, POWERUPS)
+    // 7. SHARED GAME API (COINS, HIGH SCORES, SKINS, POWERUPS)
     // =========================================================================
     const GameAPI = {
       addCoins(amount) {
@@ -1186,11 +1792,15 @@ const FIREBASE_CONFIG = {
       },
       submitScore(gameId, score) {
         const prev = userProfile.highScores[gameId] || 0;
-        if (score > prev) {
-          userProfile.highScores[gameId] = Math.floor(score);
-          document.getElementById("activeGameBest").textContent = Math.floor(score).toLocaleString();
+        const cleanScore = Math.floor(score);
+        if (cleanScore > prev) {
+          userProfile.highScores[gameId] = cleanScore;
+          const bestEl = document.getElementById("activeGameBest");
+          if (bestEl) bestEl.textContent = cleanScore.toLocaleString();
           renderGameGrid();
           syncProfileToCloud();
+          const g = GAMES_LIST.find(x => x.id === gameId);
+          logPlayerAction("SCORE", `New high score in ${g ? g.title : gameId}: ${cleanScore.toLocaleString()}`);
         }
       },
       getSkin(gameId) {
@@ -1219,13 +1829,51 @@ const FIREBASE_CONFIG = {
     }
 
     // =========================================================================
-    // 6. AUTHENTICATION & ADMIN ACCESS CONTROL
+    // 8. PRESENCE SYSTEM (ONLINE, OFFLINE, AUTOMATIC)
+    // =========================================================================
+    function updatePresenceUI() {
+      const sel = document.getElementById("presenceModeSelect");
+      const dot = document.getElementById("navPresenceDot");
+      if (sel) sel.value = userProfile.presenceMode || "automatic";
+      const isOnline = computeIsPlayerOnline(userProfile);
+      if (dot) {
+        dot.className = "status-dot " + (isOnline ? "online" : "offline");
+      }
+    }
+
+    window.setPresenceMode = async (mode) => {
+      userProfile.presenceMode = mode;
+      await syncProfileToCloud();
+      await logPlayerAction("PRESENCE", `Changed online status mode to ${mode.toUpperCase()}`);
+      renderFriendsView();
+      renderLeaderboardView();
+      showToast(`Status set to ${mode.charAt(0).toUpperCase() + mode.slice(1)}`);
+    };
+
+    document.addEventListener("visibilitychange", () => {
+      if (userProfile.presenceMode === "automatic") {
+        syncProfileToCloud();
+      }
+    });
+
+    window.addEventListener("beforeunload", () => {
+      if (userProfile.presenceMode === "automatic") {
+        userProfile.lastActive = 0;
+        saveLocalProfile();
+      }
+    });
+
+    setInterval(() => {
+      if (userProfile.presenceMode === "automatic" && document.visibilityState === "visible") {
+        syncProfileToCloud();
+      }
+    }, 45000);
+
+    // =========================================================================
+    // 9. AUTHENTICATION & ADMIN ACCESS CONTROL
     // =========================================================================
     function checkIsAdmin(user) {
-      if (!isFirebaseConfigured) {
-        // In local preview mode before Firebase config is pasted, allow testing Admin Panel
-        return true;
-      }
+      if (!isFirebaseConfigured) return true;
       if (!user || !user.email) return false;
       return ADMIN_EMAILS.map(e => e.toLowerCase()).includes(user.email.toLowerCase());
     }
@@ -1239,16 +1887,23 @@ const FIREBASE_CONFIG = {
 
       if (!isFirebaseConfigured) {
         banner.style.display = "block";
-        banner.innerHTML = "⚡ <strong>Local Demo Mode Active:</strong> Paste your Firebase keys into <code>games/index.html</code> to enable live cloud accounts & global promo codes. Admin Panel is unlocked locally for testing.";
+        banner.innerHTML = "⚡ <strong>Local Demo Mode Active:</strong> Add your Firebase config to enable live multi-player sync.";
       } else {
         banner.style.display = "none";
       }
 
+      document.getElementById("myFriendCodeDisplay").textContent = userProfile.friendCode;
+      document.getElementById("myPlayerSinceCardText").textContent = `Player since ${userProfile.playerSince}`;
+
       if (currentUser) {
-        authBtn.textContent = "👤 " + (currentUser.email ? currentUser.email.split("@")[0] : "Account");
+        const label = userProfile.displayName || (currentUser.email ? currentUser.email.split("@")[0] : "Account");
+        authBtn.textContent = "👤 " + label;
         signedOutView.style.display = "none";
         signedInView.style.display = "block";
         document.getElementById("userEmailDisplay").textContent = currentUser.email || currentUser.uid;
+        document.getElementById("accountPlayerSince").textContent = `Player since ${userProfile.playerSince}`;
+        document.getElementById("accountFriendCode").textContent = userProfile.friendCode;
+        document.getElementById("profileNicknameInput").value = userProfile.displayName || "";
         const isAdmin = checkIsAdmin(currentUser);
         adminBtn.style.display = isAdmin ? "inline-flex" : "none";
         document.getElementById("userRoleBadge").textContent = isAdmin ? "🛡️ SITE OWNER / ADMIN" : "🎮 VERIFIED PLAYER";
@@ -1258,6 +1913,7 @@ const FIREBASE_CONFIG = {
         signedInView.style.display = "none";
         adminBtn.style.display = !isFirebaseConfigured ? "inline-flex" : "none";
       }
+      updatePresenceUI();
     }
 
     if (auth) {
@@ -1266,6 +1922,13 @@ const FIREBASE_CONFIG = {
         updateAuthUI();
         if (user) {
           await loadProfileFromCloud(user);
+          subscribeToChatMessages();
+        } else {
+          await fetchAllPlayers();
+          renderLeaderboardView();
+          renderFriendsView();
+          renderChatThreads();
+          renderChatMessages();
         }
       });
     } else {
@@ -1278,6 +1941,7 @@ const FIREBASE_CONFIG = {
       const pass = document.getElementById("authPassword").value;
       try {
         await signInWithEmailAndPassword(auth, email, pass);
+        await logPlayerAction("PRESENCE", "Signed in via Email/Password");
         closeModal("authModal");
         showToast("✅ Signed in!");
       } catch (e) {
@@ -1289,8 +1953,18 @@ const FIREBASE_CONFIG = {
       if (!auth) return showToast("⚠️ Add your Firebase config first to create cloud accounts.");
       const email = document.getElementById("authEmail").value.trim();
       const pass = document.getElementById("authPassword").value;
+      const nick = document.getElementById("authDisplayName").value.trim();
       try {
-        await createUserWithEmailAndPassword(auth, email, pass);
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        const now = Date.now();
+        userProfile.uid = cred.user.uid;
+        userProfile.email = email;
+        userProfile.displayName = nick || email.split("@")[0];
+        userProfile.createdAt = now;
+        userProfile.playerSince = formatMMDDYY(now);
+        userProfile.friendCode = generateFriendCodeString();
+        await syncProfileToCloud();
+        await logPlayerAction("PRESENCE", `Registered new account (${userProfile.displayName})`);
         closeModal("authModal");
         showToast("🎉 Account created & synced!");
       } catch (e) {
@@ -1303,6 +1977,7 @@ const FIREBASE_CONFIG = {
       try {
         const provider = new GoogleAuthProvider();
         await signInWithPopup(auth, provider);
+        await logPlayerAction("PRESENCE", "Signed in via Google");
         closeModal("authModal");
         showToast("✅ Signed in with Google!");
       } catch (e) {
@@ -1310,7 +1985,19 @@ const FIREBASE_CONFIG = {
       }
     };
 
+    window.updateNickname = async () => {
+      const nick = document.getElementById("profileNicknameInput").value.trim();
+      if (!nick) return showToast("Please enter a nickname.");
+      userProfile.displayName = nick;
+      await syncProfileToCloud();
+      await logPlayerAction("PRESENCE", `Updated nickname to "${nick}"`);
+      updateAuthUI();
+      renderLeaderboardView();
+      showToast("✅ Nickname updated!");
+    };
+
     window.signOutUser = async () => {
+      await logPlayerAction("PRESENCE", "Signed out");
       if (auth) await signOut(auth);
       currentUser = null;
       updateAuthUI();
@@ -1319,15 +2006,30 @@ const FIREBASE_CONFIG = {
     };
 
     // =========================================================================
-    // 7. REDEEM CODE ENGINE & OWNER ADMIN DASHBOARD
+    // 10. REDEEM CODE ENGINE (DISAPPEARS STARTER CODE ONCE CLAIMED)
     // =========================================================================
+    function updateRedeemModalUI() {
+      const starterHint = document.getElementById("starterCodeHint");
+      if (starterHint) {
+        const claimed = userProfile.redeemedCodes.includes("WELCOME500");
+        starterHint.style.display = claimed ? "none" : "block";
+      }
+    }
+
+    window.fillStarterCode = () => {
+      const input = document.getElementById("redeemCodeInput");
+      input.value = "WELCOME500";
+      input.focus();
+    };
+
     window.handleRedeemCode = async () => {
       const input = document.getElementById("redeemCodeInput");
       const codeStr = input.value.trim().toUpperCase();
       if (!codeStr) return showToast("Please enter a code.");
 
       if (userProfile.redeemedCodes.includes(codeStr)) {
-        return showToast("⚠️ You already redeemed " + codeStr + "!");
+        updateRedeemModalUI();
+        return showToast("⚠️ You already claimed " + codeStr + "!");
       }
 
       let codeObj = null;
@@ -1350,14 +2052,14 @@ const FIREBASE_CONFIG = {
       }
 
       if (!codeObj || codeObj.active === false) {
+        await logPlayerAction("REDEEM", `Attempted invalid/expired code: ${codeStr}`);
         return showToast("❌ Invalid or expired code.");
       }
 
       if (codeObj.maxUses > 0 && (codeObj.usedCount || 0) >= codeObj.maxUses) {
-        return showToast("❌ This code has reached its maximum redemptions.");
+        return showToast("❌ This code has reached its maximum uses.");
       }
 
-      // Apply Rewards
       let rewardSummary = "";
       if (codeObj.rewardType === "coins") {
         const amt = Number(codeObj.amount) || 500;
@@ -1380,7 +2082,7 @@ const FIREBASE_CONFIG = {
         SKINS_CATALOG.forEach(s => {
           if (!userProfile.unlockedSkins.includes(s.id)) userProfile.unlockedSkins.push(s.id);
         });
-        rewardSummary = "Unlocked ALL Exclusive Skins!";
+        rewardSummary = "Unlocked ALL Skins!";
       } else if (codeObj.rewardType === "powerup") {
         const pup = POWERUPS_CATALOG.find(p => p.id === codeObj.powerupId);
         if (pup && !userProfile.powerups.includes(pup.id)) {
@@ -1391,8 +2093,8 @@ const FIREBASE_CONFIG = {
 
       userProfile.redeemedCodes.push(codeStr);
       await syncProfileToCloud();
+      await logPlayerAction("REDEEM", `Redeemed code ${codeStr} (${rewardSummary})`);
 
-      // Increment usage counter
       if (fromCloud && db) {
         try {
           await updateDoc(doc(db, "redeem_codes", codeStr), { usedCount: increment(1) });
@@ -1404,16 +2106,520 @@ const FIREBASE_CONFIG = {
 
       SFX.play("powerup");
       input.value = "";
+      updateRedeemModalUI();
       closeModal("redeemModal");
       if (activeGameId) renderActiveGameSkins();
+      renderShopView();
       showToast(`🎉 Code Redeemed! ${rewardSummary}`);
     };
 
-    // Admin Dashboard Helpers
+    // =========================================================================
+    // 11. LEADERBOARDS (FOR EVERY SINGLE GAME + OVERALL COINS)
+    // =========================================================================
+    function populateLeaderboardSelect() {
+      const sel = document.getElementById("leaderboardGameSelect");
+      sel.innerHTML = GAMES_LIST.map(g => `<option value="${g.id}">${g.icon} ${g.title}</option>`).join("") +
+        `<option value="coins">🪙 All-Time Arcade Coins</option>`;
+    }
+
+    async function fetchAllPlayers() {
+      const map = new Map();
+      // Always include current player up-to-date
+      const selfRecord = {
+        ...userProfile,
+        uid: currentUser ? currentUser.uid : userProfile.uid,
+        email: currentUser ? currentUser.email : (userProfile.email || "local@arcade"),
+        displayName: userProfile.displayName || (currentUser?.email ? currentUser.email.split("@")[0] : "You")
+      };
+      map.set(selfRecord.uid, selfRecord);
+
+      if (db && currentUser) {
+        try {
+          const snap = await getDocs(collection(db, "users"));
+          snap.forEach(d => {
+            const data = d.data();
+            if (d.id !== selfRecord.uid) {
+              map.set(d.id, {
+                uid: d.id,
+                email: data.email || "",
+                displayName: data.displayName || (data.email ? data.email.split("@")[0] : "Player"),
+                playerSince: data.playerSince || formatMMDDYY(data.createdAt || Date.now()),
+                friendCode: data.friendCode || "NX-000000",
+                friends: data.friends || [],
+                presenceMode: data.presenceMode || "automatic",
+                lastActive: data.lastActive || 0,
+                coins: Number(data.coins || 0),
+                gems: Number(data.gems || 0),
+                redeemedCodes: data.redeemedCodes || [],
+                highScores: data.highScores || {}
+              });
+            }
+          });
+        } catch (err) {
+          console.warn("Could not fetch users list:", err.message);
+        }
+      }
+
+      allPlayersCache = Array.from(map.values());
+      return allPlayersCache;
+    }
+
+    window.renderLeaderboardView = async () => {
+      await fetchAllPlayers();
+      const sel = document.getElementById("leaderboardGameSelect");
+      const targetId = sel.value || "cookie";
+      const playBtn = document.getElementById("playFromLeaderboardBtn");
+      const banner = document.getElementById("leaderboardGameBanner");
+
+      let title = "All-Time Arcade Coins";
+      let icon = "🪙";
+      if (targetId !== "coins") {
+        const g = GAMES_LIST.find(x => x.id === targetId);
+        title = g ? g.title : targetId;
+        icon = g ? g.icon : "🎮";
+        playBtn.style.display = "inline-flex";
+      } else {
+        playBtn.style.display = "none";
+      }
+
+      banner.innerHTML = `
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span style="font-size:2rem;">${icon}</span>
+          <div>
+            <div style="font-size:1.15rem; font-weight:800;">${title} Leaderboard</div>
+            <div style="font-size:0.8rem; color:var(--text-muted);">Ranked across ${allPlayersCache.length} registered player(s)</div>
+          </div>
+        </div>
+      `;
+
+      const ranked = allPlayersCache
+        .map(p => ({
+          ...p,
+          scoreVal: targetId === "coins" ? (p.coins || 0) : ((p.highScores && p.highScores[targetId]) || 0)
+        }))
+        .sort((a, b) => b.scoreVal - a.scoreVal);
+
+      const tbody = document.getElementById("leaderboardTableBody");
+      tbody.innerHTML = ranked.map((p, idx) => {
+        const medal = idx === 0 ? "🥇 #1" : idx === 1 ? "🥈 #2" : idx === 2 ? "🥉 #3" : `#${idx + 1}`;
+        const online = computeIsPlayerOnline(p);
+        const isMe = p.uid === (currentUser ? currentUser.uid : userProfile.uid);
+        return `
+          <tr style="${isMe ? 'background:rgba(99,102,241,0.1);' : ''}">
+            <td style="font-family:var(--font-mono); font-weight:800;">${medal}</td>
+            <td>
+              <div style="font-weight:800;">${escapeHtml(p.displayName)} ${isMe ? '<span style="font-size:0.72rem; color:var(--accent-cyan);">(You)</span>' : ''}</div>
+            </td>
+            <td>
+              <span style="display:inline-flex; align-items:center; gap:0.4rem; font-size:0.8rem; color:${online ? '#34d399' : '#94a3b8'};">
+                <span class="status-dot ${online ? 'online' : 'offline'}"></span>
+                ${online ? 'Online' : 'Offline'}
+              </span>
+            </td>
+            <td style="font-size:0.8rem; color:var(--text-muted);">Player since ${p.playerSince || '--/--/--'}</td>
+            <td style="text-align:right; font-family:var(--font-mono); font-weight:800; color:var(--accent-amber);">
+              ${p.scoreVal.toLocaleString()}
+            </td>
+          </tr>
+        `;
+      }).join("");
+    };
+
+    window.launchSelectedLeaderboardGame = () => {
+      const targetId = document.getElementById("leaderboardGameSelect").value;
+      if (targetId && targetId !== "coins") {
+        launchGame(targetId);
+      }
+    };
+
+    window.openGameLeaderboardShortcut = () => {
+      const gid = activeGameId;
+      closeGameModal();
+      switchMainTab("leaderboards");
+      if (gid) {
+        document.getElementById("leaderboardGameSelect").value = gid;
+        renderLeaderboardView();
+      }
+    };
+
+    // =========================================================================
+    // 12. FRIENDS & REGENERATABLE FRIEND CODES
+    // =========================================================================
+    window.copyMyFriendCode = () => {
+      navigator.clipboard.writeText(userProfile.friendCode);
+      showToast(`📋 Copied Friend Code: ${userProfile.friendCode}`);
+    };
+
+    window.regenerateFriendCode = async () => {
+      const oldCode = userProfile.friendCode;
+      let newCode = generateFriendCodeString();
+      while (newCode === oldCode) newCode = generateFriendCodeString();
+      userProfile.friendCode = newCode;
+      await syncProfileToCloud();
+      await logPlayerAction("FRIEND", `Regenerated Friend Code (${oldCode} → ${newCode})`);
+      updateAuthUI();
+      showToast(`↻ New Friend Code generated: ${newCode}`);
+    };
+
+    window.addFriendByCode = async () => {
+      const input = document.getElementById("addFriendCodeInput");
+      const code = input.value.trim().toUpperCase();
+      if (!code) return showToast("Enter a Friend Code.");
+      if (code === userProfile.friendCode) return showToast("⚠️ That's your own Friend Code!");
+
+      await fetchAllPlayers();
+      const target = allPlayersCache.find(p => (p.friendCode || "").toUpperCase() === code);
+      if (!target) {
+        return showToast("❌ No active player found with that Friend Code.");
+      }
+
+      if (userProfile.friends.includes(target.uid)) {
+        return showToast(`You are already friends with ${target.displayName}!`);
+      }
+
+      userProfile.friends.push(target.uid);
+      await syncProfileToCloud();
+
+      // Also reciprocate in Firestore if permitted so both see each other
+      if (db && currentUser && target.uid) {
+        try {
+          const targetFriends = Array.isArray(target.friends) ? [...target.friends] : [];
+          if (!targetFriends.includes(currentUser.uid)) {
+            targetFriends.push(currentUser.uid);
+            await updateDoc(doc(db, "users", target.uid), { friends: targetFriends });
+          }
+        } catch (e) {}
+      }
+
+      await logPlayerAction("FRIEND", `Added friend ${target.displayName} (${code})`);
+      input.value = "";
+      SFX.play("coin");
+      renderFriendsView();
+      renderChatThreads();
+      showToast(`🤝 Added ${target.displayName} to your friends!`);
+    };
+
+    window.removeFriend = async (friendUid) => {
+      userProfile.friends = userProfile.friends.filter(id => id !== friendUid);
+      await syncProfileToCloud();
+      await logPlayerAction("FRIEND", `Removed friend (${friendUid})`);
+      renderFriendsView();
+      renderChatThreads();
+      showToast("Friend removed.");
+    };
+
+    window.openDirectMessageWith = (friendUid) => {
+      activeChatThread = friendUid;
+      switchMainTab("messages");
+    };
+
+    window.renderFriendsView = async () => {
+      await fetchAllPlayers();
+      document.getElementById("myFriendCodeDisplay").textContent = userProfile.friendCode;
+      document.getElementById("myPlayerSinceCardText").textContent = `Player since ${userProfile.playerSince}`;
+
+      const friendObjs = userProfile.friends
+        .map(fid => allPlayersCache.find(p => p.uid === fid))
+        .filter(Boolean);
+
+      const onlineCount = friendObjs.filter(f => computeIsPlayerOnline(f)).length;
+      const badge = document.getElementById("onlineFriendsBadge");
+      if (onlineCount > 0) {
+        badge.style.display = "inline-block";
+        badge.textContent = onlineCount;
+      } else {
+        badge.style.display = "none";
+      }
+
+      document.getElementById("friendsCountLabel").textContent = friendObjs.length;
+      const grid = document.getElementById("friendsListGrid");
+
+      if (friendObjs.length === 0) {
+        grid.innerHTML = `
+          <div class="panel-card" style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:2rem;">
+            No friends added yet. Share your Friend Code <strong>${userProfile.friendCode}</strong> or enter a friend's code above!
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = friendObjs.map(f => {
+        const online = computeIsPlayerOnline(f);
+        return `
+          <div class="friend-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:0.55rem;">
+                <span class="status-dot ${online ? 'online' : 'offline'}"></span>
+                <div>
+                  <div style="font-weight:800; font-size:1rem;">${escapeHtml(f.displayName)}</div>
+                  <div style="font-size:0.76rem; color:${online ? '#34d399' : '#94a3b8'};">${online ? 'Online' : 'Offline'} • Player since ${f.playerSince || '--/--/--'}</div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; gap:0.5rem; margin-top:0.25rem;">
+              <button class="btn btn-primary" style="flex:1; justify-content:center; padding:0.42rem; font-size:0.8rem;" onclick="openDirectMessageWith('${f.uid}')">💬 Message</button>
+              <button class="btn btn-ghost" style="padding:0.42rem 0.7rem; font-size:0.8rem;" onclick="removeFriend('${f.uid}')">Remove</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    };
+
+    // =========================================================================
+    // 13. MESSAGES TAB (GLOBAL LOBBY + 1-ON-1 DIRECT MESSAGES)
+    // =========================================================================
+    function getDmRoomId(uidA, uidB) {
+      return [uidA, uidB].sort().join("__");
+    }
+
+    function subscribeToChatMessages() {
+      if (unsubChat) {
+        try { unsubChat(); } catch (e) {}
+        unsubChat = null;
+      }
+      if (!db || !currentUser) {
+        chatMessagesCache = loadLocalMessages();
+        renderChatThreads();
+        renderChatMessages();
+        return;
+      }
+      try {
+        const q = query(collection(db, "messages"), orderBy("timestamp", "asc"), limit(200));
+        unsubChat = onSnapshot(q, (snap) => {
+          const list = [];
+          snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+          chatMessagesCache = list;
+          saveLocalMessages(list);
+          renderChatMessages();
+        }, (err) => {
+          console.warn("Chat snapshot fallback:", err.message);
+          chatMessagesCache = loadLocalMessages();
+          renderChatMessages();
+        });
+      } catch (e) {
+        chatMessagesCache = loadLocalMessages();
+        renderChatMessages();
+      }
+    }
+
+    window.selectChatThread = (threadId) => {
+      activeChatThread = threadId;
+      renderChatThreads();
+      renderChatMessages();
+    };
+
+    function renderChatThreads() {
+      const sidebar = document.getElementById("chatThreadsSidebar");
+      const friendObjs = userProfile.friends
+        .map(fid => allPlayersCache.find(p => p.uid === fid))
+        .filter(Boolean);
+
+      sidebar.innerHTML = `
+        <div style="font-size:0.74rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; padding:0.25rem 0.5rem;">Channels</div>
+        <button class="chat-thread-btn ${activeChatThread === 'global' ? 'active' : ''}" onclick="selectChatThread('global')">
+          <span style="display:flex; align-items:center; gap:0.5rem;">
+            <span class="status-dot online"></span>
+            <strong>🌐 Global Lounge</strong>
+          </span>
+        </button>
+
+        <div style="font-size:0.74rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; padding:0.65rem 0.5rem 0.25rem;">Direct Messages</div>
+        ${friendObjs.length === 0
+          ? `<div style="font-size:0.8rem; color:var(--text-muted); padding:0.5rem;">Add friends in the Friends tab to DM them directly.</div>`
+          : friendObjs.map(f => {
+              const online = computeIsPlayerOnline(f);
+              return `
+                <button class="chat-thread-btn ${activeChatThread === f.uid ? 'active' : ''}" onclick="selectChatThread('${f.uid}')">
+                  <span style="display:flex; align-items:center; gap:0.5rem;">
+                    <span class="status-dot ${online ? 'online' : 'offline'}"></span>
+                    <span>${escapeHtml(f.displayName)}</span>
+                  </span>
+                  <span style="font-size:0.72rem; color:var(--text-muted);">${online ? 'Online' : 'Offline'}</span>
+                </button>
+              `;
+            }).join("")
+        }
+      `;
+    }
+
+    function renderChatMessages() {
+      const feed = document.getElementById("chatMessagesFeed");
+      const titleEl = document.getElementById("activeChatTitle");
+      const subEl = document.getElementById("activeChatSub");
+      const dotEl = document.getElementById("activeChatDot");
+      const myUid = currentUser ? currentUser.uid : userProfile.uid;
+
+      let roomId = "global";
+      if (activeChatThread === "global") {
+        titleEl.textContent = "🌐 Global Arcade Lounge";
+        subEl.textContent = "Live chat with all players";
+        dotEl.className = "status-dot online";
+      } else {
+        const friend = allPlayersCache.find(p => p.uid === activeChatThread);
+        const online = computeIsPlayerOnline(friend);
+        roomId = getDmRoomId(myUid, activeChatThread);
+        titleEl.textContent = friend ? `💬 ${friend.displayName}` : "Direct Message";
+        subEl.textContent = friend ? `${online ? 'Online' : 'Offline'} • Player since ${friend.playerSince || '--/--/--'}` : "";
+        dotEl.className = "status-dot " + (online ? "online" : "offline");
+      }
+
+      const msgs = chatMessagesCache.filter(m => (m.roomId || "global") === roomId);
+      if (msgs.length === 0) {
+        feed.innerHTML = `<div style="text-align:center; color:var(--text-muted); margin:auto; font-size:0.88rem;">No messages here yet. Say hello!</div>`;
+        return;
+      }
+
+      feed.innerHTML = msgs.map(m => {
+        const isMine = m.senderUid === myUid;
+        const timeStr = new Date(m.timestamp || Date.now()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        const adminTag = m.isAdmin ? `<span style="background:rgba(244,63,94,0.22); color:#fda4af; font-size:0.68rem; padding:0.1rem 0.4rem; border-radius:4px; margin-left:0.35rem;">ADMIN</span>` : "";
+        return `
+          <div class="chat-msg ${isMine ? 'mine' : ''}">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; margin-bottom:0.25rem;">
+              <span style="font-size:0.76rem; font-weight:800; color:${isMine ? '#a5b4fc' : 'var(--accent-cyan)'};">
+                ${escapeHtml(m.senderName || "Player")}${adminTag}
+              </span>
+              <span style="font-size:0.7rem; color:var(--text-muted);">${timeStr}</span>
+            </div>
+            <div style="font-size:0.9rem; line-height:1.4; word-break:break-word;">${escapeHtml(m.text)}</div>
+          </div>
+        `;
+      }).join("");
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    window.sendChatMessage = async () => {
+      const input = document.getElementById("chatMessageInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const myUid = currentUser ? currentUser.uid : userProfile.uid;
+      const roomId = activeChatThread === "global" ? "global" : getDmRoomId(myUid, activeChatThread);
+      const msgObj = {
+        id: "msg_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        roomId,
+        senderUid: myUid,
+        senderEmail: currentUser ? currentUser.email : "guest@local",
+        senderName: userProfile.displayName || (currentUser?.email ? currentUser.email.split("@")[0] : "Guest"),
+        isAdmin: checkIsAdmin(currentUser),
+        text,
+        timestamp: Date.now()
+      };
+
+      input.value = "";
+      chatMessagesCache.push(msgObj);
+      saveLocalMessages(chatMessagesCache);
+      renderChatMessages();
+
+      if (db && currentUser) {
+        try {
+          await addDoc(collection(db, "messages"), msgObj);
+        } catch (e) {}
+      }
+      await logPlayerAction("CHAT", `Sent message in [${roomId}]: "${text.slice(0, 60)}"`);
+    };
+
+    window.addEventListener("storage", (e) => {
+      if (e.key === "arcade_nexus_messages_v2") {
+        chatMessagesCache = loadLocalMessages();
+        renderChatMessages();
+      }
+    });
+
+    // =========================================================================
+    // 14. SHOP TAB (BUY OR EQUIP SKINS & POWERUPS)
+    // =========================================================================
+    function renderShopView() {
+      const pGrid = document.getElementById("shopPowerupsGrid");
+      pGrid.innerHTML = POWERUPS_CATALOG.map(p => {
+        const owned = userProfile.powerups.includes(p.id);
+        return `
+          <div style="background:var(--bg-card); border:1px solid ${owned ? 'var(--accent-emerald)' : 'var(--border-subtle)'}; border-radius:14px; padding:1rem; display:flex; flex-direction:column; gap:0.5rem;">
+            <div style="font-weight:800; color:#fff;">⚡ ${p.name}</div>
+            <div style="font-size:0.82rem; color:var(--text-muted); flex:1;">${p.desc}</div>
+            ${owned
+              ? `<div style="color:var(--accent-emerald); font-weight:700; font-size:0.84rem;">✓ ACTIVE</div>`
+              : `<button class="btn btn-primary" style="justify-content:center; padding:0.5rem; font-size:0.84rem;" onclick="buyPowerup('${p.id}')">🪙 ${p.price.toLocaleString()}</button>`
+            }
+          </div>
+        `;
+      }).join("");
+
+      const sGrid = document.getElementById("shopSkinsGrid");
+      sGrid.innerHTML = SKINS_CATALOG.filter(s => s.price > 0).map(s => {
+        const owned = userProfile.unlockedSkins.includes(s.id);
+        const equipped = userProfile.equippedSkins[s.game] === s.id;
+        const g = GAMES_LIST.find(x => x.id === s.game);
+        return `
+          <div style="background:var(--bg-card); border:1px solid ${equipped ? 'var(--accent-cyan)' : 'var(--border-subtle)'}; border-radius:14px; padding:1rem; display:flex; flex-direction:column; gap:0.5rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:0.74rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${g ? g.title : s.game}</span>
+              <span style="width:14px; height:14px; border-radius:50%; background:${s.color}; box-shadow:0 0 8px ${s.color};"></span>
+            </div>
+            <div style="font-weight:800;">${s.name}</div>
+            ${owned
+              ? `<button class="btn ${equipped ? 'btn-ghost' : 'btn-primary'}" style="justify-content:center; padding:0.46rem; font-size:0.82rem;" onclick="equipSkin('${s.game}','${s.id}')">${equipped ? '✓ Equipped' : 'Equip Skin'}</button>`
+              : `<button class="btn btn-redeem" style="justify-content:center; padding:0.46rem; font-size:0.82rem;" onclick="buySkin('${s.id}')">🪙 ${s.price.toLocaleString()}</button>`
+            }
+          </div>
+        `;
+      }).join("");
+    }
+
+    window.buyPowerup = async (pid) => {
+      const p = POWERUPS_CATALOG.find(x => x.id === pid);
+      if (!p || userProfile.powerups.includes(pid)) return;
+      if (userProfile.coins < p.price) return showToast("❌ Not enough Coins! Play games or redeem a code.");
+      userProfile.coins -= p.price;
+      userProfile.powerups.push(pid);
+      SFX.play("powerup");
+      await syncProfileToCloud();
+      await logPlayerAction("SHOP", `Purchased Powerup: ${p.name} (-${p.price.toLocaleString()} Coins)`);
+      renderShopView();
+      showToast(`⚡ Unlocked ${p.name}!`);
+    };
+
+    window.buySkin = async (sid) => {
+      const s = SKINS_CATALOG.find(x => x.id === sid);
+      if (!s || userProfile.unlockedSkins.includes(sid)) return;
+      if (userProfile.coins < s.price) return showToast("❌ Not enough Coins! Play games or redeem a code.");
+      userProfile.coins -= s.price;
+      userProfile.unlockedSkins.push(sid);
+      userProfile.equippedSkins[s.game] = sid;
+      SFX.play("powerup");
+      await syncProfileToCloud();
+      await logPlayerAction("SHOP", `Purchased Skin: ${s.name} (-${s.price.toLocaleString()} Coins)`);
+      renderShopView();
+      showToast(`🎨 Unlocked & Equipped ${s.name}!`);
+    };
+
+    window.equipSkin = async (gameId, skinId) => {
+      if (!userProfile.unlockedSkins.includes(skinId)) {
+        return showToast("🔒 Unlock this skin in the Shop or with a Redeem Code!");
+      }
+      userProfile.equippedSkins[gameId] = skinId;
+      SFX.play("click");
+      await syncProfileToCloud();
+      renderShopView();
+      if (activeGameId === gameId) renderActiveGameSkins();
+      showToast("✨ Skin equipped!");
+    };
+
+    // =========================================================================
+    // 15. OWNER ADMIN DASHBOARD (PLAYERS, COINS/GEMS, LOGS, CODES, MODERATION)
+    // =========================================================================
+    window.switchAdminPane = (paneId) => {
+      document.querySelectorAll(".admin-subtab").forEach(b => b.classList.toggle("active", b.dataset.pane === paneId));
+      document.querySelectorAll(".admin-pane").forEach(p => p.classList.toggle("active", p.id === "admin-pane-" + paneId));
+    };
+
     function populateAdminDropdowns() {
       const gameSel = document.getElementById("adminTargetGame");
       gameSel.innerHTML = `<option value="all">🌐 All Games (Global Reward)</option>` +
         GAMES_LIST.map(g => `<option value="${g.id}">${g.icon} ${g.title}</option>`).join("");
+
+      const modGameSel = document.getElementById("adminModGameSelect");
+      modGameSel.innerHTML = GAMES_LIST.map(g => `<option value="${g.id}">${g.icon} ${g.title}</option>`).join("");
 
       const skinSel = document.getElementById("adminSkinSelect");
       skinSel.innerHTML = SKINS_CATALOG.filter(s => s.price > 0).map(s => {
@@ -1445,7 +2651,168 @@ const FIREBASE_CONFIG = {
     window.openAdminModal = async () => {
       if (!checkIsAdmin(currentUser)) return showToast("⛔ Admin access only.");
       openModal("adminModal");
+      await refreshAdminData();
+    };
+
+    window.refreshAdminData = async () => {
+      await fetchAllPlayers();
+      await fetchAllLogs();
+      renderAdminPlayersTable();
+      renderAdminLogsTable();
       await renderAdminCodesTable();
+      renderAdminModeration();
+    };
+
+    async function fetchAllLogs() {
+      let logs = loadLocalLogs();
+      if (db && currentUser) {
+        try {
+          const q = query(collection(db, "activity_logs"), orderBy("timestamp", "desc"), limit(300));
+          const snap = await getDocs(q);
+          const cloudLogs = [];
+          snap.forEach(d => cloudLogs.push(d.data()));
+          if (cloudLogs.length > 0) logs = cloudLogs;
+        } catch (e) {}
+      }
+      allLogsCache = logs;
+      return logs;
+    }
+
+    window.renderAdminPlayersTable = () => {
+      const q = (document.getElementById("adminPlayerSearch").value || "").trim().toLowerCase();
+      const filtered = allPlayersCache.filter(p =>
+        !q ||
+        (p.displayName || "").toLowerCase().includes(q) ||
+        (p.email || "").toLowerCase().includes(q) ||
+        (p.friendCode || "").toLowerCase().includes(q)
+      );
+
+      // Populate player filter dropdowns in Logs & Moderation tabs
+      const logPlayerSel = document.getElementById("adminLogPlayerFilter");
+      const prevFilter = logPlayerSel.value;
+      logPlayerSel.innerHTML = `<option value="all">All Players (${allPlayersCache.length})</option>` +
+        allPlayersCache.map(p => `<option value="${p.uid}">${escapeHtml(p.displayName)} (${escapeHtml(p.email || p.uid)})</option>`).join("");
+      logPlayerSel.value = prevFilter || "all";
+
+      const modPlayerSel = document.getElementById("adminModPlayerSelect");
+      modPlayerSel.innerHTML = allPlayersCache.map(p => `<option value="${p.uid}">${escapeHtml(p.displayName)} (${escapeHtml(p.email || p.uid)})</option>`).join("");
+
+      const tbody = document.getElementById("adminPlayersTableBody");
+      tbody.innerHTML = filtered.map(p => {
+        const online = computeIsPlayerOnline(p);
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:800;">${escapeHtml(p.displayName)}</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(p.email || p.uid)}</div>
+            </td>
+            <td>
+              <span style="display:inline-flex; align-items:center; gap:0.35rem; font-size:0.78rem; color:${online ? '#34d399' : '#94a3b8'};">
+                <span class="status-dot ${online ? 'online' : 'offline'}"></span>
+                ${online ? 'Online' : 'Offline'} (${p.presenceMode || 'auto'})
+              </span>
+            </td>
+            <td style="font-size:0.8rem;">${p.playerSince || '--/--/--'}</td>
+            <td><span class="code-badge" onclick="copyCodeText('${p.friendCode || ''}')">${p.friendCode || 'N/A'}</span></td>
+            <td style="font-family:var(--font-mono); font-weight:800; color:var(--accent-amber);">${(p.coins || 0).toLocaleString()}</td>
+            <td style="font-family:var(--font-mono); font-weight:800; color:var(--accent-cyan);">${(p.gems || 0).toLocaleString()}</td>
+            <td>
+              <div style="display:flex; gap:0.35rem; flex-wrap:wrap;">
+                <button class="btn btn-redeem" style="padding:0.28rem 0.55rem; font-size:0.74rem;" onclick="adminAdjustCurrency('${p.uid}', 'coins', 1000)">+1k 🪙</button>
+                <button class="btn btn-primary" style="padding:0.28rem 0.55rem; font-size:0.74rem;" onclick="adminAdjustCurrency('${p.uid}', 'gems', 50)">+50 💎</button>
+                <button class="btn btn-ghost" style="padding:0.28rem 0.55rem; font-size:0.74rem;" onclick="adminPromptSetBalance('${p.uid}')">Edit</button>
+                <button class="btn btn-ghost" style="padding:0.28rem 0.55rem; font-size:0.74rem;" onclick="adminInspectPlayerLogs('${p.uid}')">Logs</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    };
+
+    window.adminAdjustCurrency = async (uid, field, delta) => {
+      if (!checkIsAdmin(currentUser)) return;
+      const myUid = currentUser ? currentUser.uid : userProfile.uid;
+      if (uid === myUid) {
+        userProfile[field] = Math.max(0, (userProfile[field] || 0) + delta);
+        await syncProfileToCloud();
+      } else if (db) {
+        try {
+          await updateDoc(doc(db, "users", uid), { [field]: increment(delta) });
+        } catch (e) {
+          showToast("⚠️ Firestore rule prevented updating other user: " + e.message);
+        }
+      }
+      await logPlayerAction("ADMIN", `Adjusted ${field} by ${delta > 0 ? '+' : ''}${delta} for player ${uid}`);
+      await refreshAdminData();
+      showToast(`✅ Updated ${field} (${delta > 0 ? '+' : ''}${delta})`);
+    };
+
+    window.adminPromptSetBalance = async (uid) => {
+      if (!checkIsAdmin(currentUser)) return;
+      const player = allPlayersCache.find(p => p.uid === uid);
+      if (!player) return;
+      const newCoins = prompt(`Set exact Coins for ${player.displayName}:`, player.coins || 0);
+      if (newCoins === null) return;
+      const newGems = prompt(`Set exact Gems for ${player.displayName}:`, player.gems || 0);
+      if (newGems === null) return;
+
+      const cVal = Math.max(0, parseInt(newCoins, 10) || 0);
+      const gVal = Math.max(0, parseInt(newGems, 10) || 0);
+      const myUid = currentUser ? currentUser.uid : userProfile.uid;
+
+      if (uid === myUid) {
+        userProfile.coins = cVal;
+        userProfile.gems = gVal;
+        await syncProfileToCloud();
+      } else if (db) {
+        try {
+          await updateDoc(doc(db, "users", uid), { coins: cVal, gems: gVal });
+        } catch (e) {
+          showToast("⚠️ Firestore error: " + e.message);
+        }
+      }
+      await logPlayerAction("ADMIN", `Set balance for ${player.displayName} to ${cVal} Coins & ${gVal} Gems`);
+      await refreshAdminData();
+      showToast("✅ Player balance updated!");
+    };
+
+    window.adminInspectPlayerLogs = (uid) => {
+      switchAdminPane("logs");
+      document.getElementById("adminLogPlayerFilter").value = uid;
+      renderAdminLogsTable();
+    };
+
+    window.renderAdminLogsTable = () => {
+      const playerFilter = document.getElementById("adminLogPlayerFilter").value;
+      const typeFilter = document.getElementById("adminLogTypeFilter").value;
+
+      const filtered = allLogsCache.filter(log => {
+        const matchPlayer = playerFilter === "all" || log.uid === playerFilter;
+        const matchType = typeFilter === "all" || log.category === typeFilter;
+        return matchPlayer && matchType;
+      });
+
+      const tbody = document.getElementById("adminLogsTableBody");
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No matching player activity logs found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(log => {
+        const dt = new Date(log.timestamp || Date.now());
+        const timeText = dt.toLocaleDateString() + " " + dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        return `
+          <tr>
+            <td style="font-family:var(--font-mono); font-size:0.76rem; color:var(--text-muted); white-space:nowrap;">${timeText}</td>
+            <td>
+              <div style="font-weight:700;">${escapeHtml(log.playerName || "Player")}</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);">${escapeHtml(log.playerEmail || log.uid)}</div>
+            </td>
+            <td><span class="code-badge">${escapeHtml(log.category || "EVENT")}</span></td>
+            <td style="font-size:0.84rem;">${escapeHtml(log.detail || "")}</td>
+          </tr>
+        `;
+      }).join("");
     };
 
     window.createAdminCode = async () => {
@@ -1490,6 +2857,7 @@ const FIREBASE_CONFIG = {
       else localCodes.unshift(newCode);
       saveLocalCodes();
 
+      await logPlayerAction("ADMIN", `Published redeem code ${codeStr} (${rewardType})`);
       SFX.play("coin");
       document.getElementById("adminCodeString").value = "";
       showToast(`✅ Created live code: ${codeStr}`);
@@ -1503,6 +2871,7 @@ const FIREBASE_CONFIG = {
       }
       localCodes = localCodes.filter(c => c.code !== codeStr);
       saveLocalCodes();
+      await logPlayerAction("ADMIN", `Deleted redeem code ${codeStr}`);
       showToast(`🗑️ Deleted code ${codeStr}`);
       await renderAdminCodesTable();
     };
@@ -1545,8 +2914,8 @@ const FIREBASE_CONFIG = {
         return `
           <tr>
             <td>
-              <span class="code-badge">${c.code}</span>
-              ${c.note ? `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:3px;">${c.note}</div>` : ""}
+              <span class="code-badge" onclick="copyCodeText('${c.code}')">${c.code}</span>
+              ${c.note ? `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:3px;">${escapeHtml(c.note)}</div>` : ""}
             </td>
             <td>${gameLabel}</td>
             <td>${rewardText}</td>
@@ -1560,88 +2929,86 @@ const FIREBASE_CONFIG = {
       }).join("");
     }
 
-    // =========================================================================
-    // 8. LOCKER (BUY OR EQUIP SKINS & POWERUPS)
-    // =========================================================================
-    function renderLocker() {
-      const pGrid = document.getElementById("lockerPowerupsGrid");
-      pGrid.innerHTML = POWERUPS_CATALOG.map(p => {
-        const owned = userProfile.powerups.includes(p.id);
-        return `
-          <div style="background:var(--bg-void); border:1px solid ${owned ? 'var(--accent-emerald)' : 'var(--border-subtle)'}; border-radius:12px; padding:0.9rem; display:flex; flex-direction:column; gap:0.45rem;">
-            <div style="font-weight:800; color:#fff;">⚡ ${p.name}</div>
-            <div style="font-size:0.8rem; color:var(--text-muted); flex:1;">${p.desc}</div>
-            ${owned
-              ? `<div style="color:var(--accent-emerald); font-weight:700; font-size:0.82rem;">✓ ACTIVE</div>`
-              : `<button class="btn btn-primary" style="justify-content:center; padding:0.45rem; font-size:0.82rem;" onclick="buyPowerup('${p.id}')">🪙 ${p.price.toLocaleString()}</button>`
-            }
-          </div>
-        `;
-      }).join("");
-
-      const sGrid = document.getElementById("lockerSkinsGrid");
-      sGrid.innerHTML = SKINS_CATALOG.filter(s => s.price > 0).map(s => {
-        const owned = userProfile.unlockedSkins.includes(s.id);
-        const equipped = userProfile.equippedSkins[s.game] === s.id;
-        const g = GAMES_LIST.find(x => x.id === s.game);
-        return `
-          <div style="background:var(--bg-void); border:1px solid ${equipped ? 'var(--accent-cyan)' : 'var(--border-subtle)'}; border-radius:12px; padding:0.9rem; display:flex; flex-direction:column; gap:0.45rem;">
-            <div style="display:flex; align-items:center; justify-content:space-between;">
-              <span style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">${g ? g.title : s.game}</span>
-              <span style="width:14px; height:14px; border-radius:50%; background:${s.color}; box-shadow:0 0 8px ${s.color};"></span>
+    function renderAdminModeration() {
+      const list = document.getElementById("adminChatModList");
+      const recent = [...chatMessagesCache].slice(-25).reverse();
+      if (recent.length === 0) {
+        list.innerHTML = `<div style="font-size:0.82rem; color:var(--text-muted);">No chat messages yet.</div>`;
+      } else {
+        list.innerHTML = recent.map(m => `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem; background:var(--bg-surface); padding:0.5rem 0.7rem; border-radius:8px; border:1px solid var(--border-subtle);">
+            <div style="font-size:0.8rem;">
+              <strong>${escapeHtml(m.senderName || "Player")}</strong> <span style="color:var(--text-muted);">[${escapeHtml(m.roomId || "global")}]</span>: ${escapeHtml(m.text)}
             </div>
-            <div style="font-weight:800;">${s.name}</div>
-            ${owned
-              ? `<button class="btn ${equipped ? 'btn-ghost' : 'btn-primary'}" style="justify-content:center; padding:0.42rem; font-size:0.8rem;" onclick="equipSkin('${s.game}','${s.id}')">${equipped ? '✓ Equipped' : 'Equip Skin'}</button>`
-              : `<button class="btn btn-redeem" style="justify-content:center; padding:0.42rem; font-size:0.8rem;" onclick="buySkin('${s.id}')">🪙 ${s.price.toLocaleString()}</button>`
-            }
+            <button class="btn btn-admin" style="padding:0.25rem 0.5rem; font-size:0.72rem;" onclick="adminDeleteChatMsg('${m.id}')">Delete</button>
           </div>
-        `;
-      }).join("");
+        `).join("");
+      }
     }
 
-    window.buyPowerup = async (pid) => {
-      const p = POWERUPS_CATALOG.find(x => x.id === pid);
-      if (!p || userProfile.powerups.includes(pid)) return;
-      if (userProfile.coins < p.price) return showToast("❌ Not enough Coins! Play games or redeem a code.");
-      userProfile.coins -= p.price;
-      userProfile.powerups.push(pid);
-      SFX.play("powerup");
-      await syncProfileToCloud();
-      renderLocker();
-      showToast(`⚡ Unlocked ${p.name}!`);
-    };
-
-    window.buySkin = async (sid) => {
-      const s = SKINS_CATALOG.find(x => x.id === sid);
-      if (!s || userProfile.unlockedSkins.includes(sid)) return;
-      if (userProfile.coins < s.price) return showToast("❌ Not enough Coins! Play games or redeem a code.");
-      userProfile.coins -= s.price;
-      userProfile.unlockedSkins.push(sid);
-      userProfile.equippedSkins[s.game] = sid;
-      SFX.play("powerup");
-      await syncProfileToCloud();
-      renderLocker();
-      showToast(`🎨 Unlocked & Equipped ${s.name}!`);
-    };
-
-    window.equipSkin = async (gameId, skinId) => {
-      if (!userProfile.unlockedSkins.includes(skinId)) {
-        return showToast("🔒 Unlock this skin in the Locker or with a Redeem Code!");
+    window.adminDeleteChatMsg = async (msgId) => {
+      if (!checkIsAdmin(currentUser)) return;
+      chatMessagesCache = chatMessagesCache.filter(m => m.id !== msgId);
+      saveLocalMessages(chatMessagesCache);
+      if (db && currentUser) {
+        try { await deleteDoc(doc(db, "messages", msgId)); } catch (e) {}
       }
-      userProfile.equippedSkins[gameId] = skinId;
-      SFX.play("click");
-      await syncProfileToCloud();
-      renderLocker();
-      if (activeGameId === gameId) renderActiveGameSkins();
-      showToast("✨ Skin equipped!");
+      await logPlayerAction("ADMIN", `Deleted chat message (${msgId})`);
+      renderAdminModeration();
+      renderChatMessages();
+      showToast("🗑️ Message deleted.");
     };
 
+    window.adminResetPlayerScore = async () => {
+      if (!checkIsAdmin(currentUser)) return;
+      const uid = document.getElementById("adminModPlayerSelect").value;
+      const gid = document.getElementById("adminModGameSelect").value;
+      const myUid = currentUser ? currentUser.uid : userProfile.uid;
+
+      if (uid === myUid) {
+        userProfile.highScores[gid] = 0;
+        await syncProfileToCloud();
+      } else if (db) {
+        try {
+          await updateDoc(doc(db, "users", uid), { [`highScores.${gid}`]: 0 });
+        } catch (e) {}
+      }
+      await logPlayerAction("ADMIN", `Reset ${gid} high score for player ${uid}`);
+      renderLeaderboardView();
+      showToast("✅ Score reset to 0.");
+    };
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
     // =========================================================================
-    // 9. MODAL & GRID NAVIGATION
+    // 16. VIEW TAB SWITCHING, MODALS & GRID NAVIGATION
     // =========================================================================
+    window.switchMainTab = (viewName) => {
+      document.querySelectorAll(".main-tab").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.view === viewName);
+      });
+      document.querySelectorAll(".view-section").forEach(sec => {
+        sec.classList.toggle("active", sec.id === "view-" + viewName);
+      });
+
+      if (viewName === "leaderboards") renderLeaderboardView();
+      if (viewName === "shop") renderShopView();
+      if (viewName === "friends") renderFriendsView();
+      if (viewName === "messages") {
+        renderChatThreads();
+        renderChatMessages();
+      }
+    };
+
     window.openModal = (id) => {
-      if (id === "lockerModal") renderLocker();
+      if (id === "redeemModal") updateRedeemModalUI();
+      if (id === "authModal") updateAuthUI();
       document.getElementById(id).classList.add("open");
     };
 
@@ -1651,7 +3018,7 @@ const FIREBASE_CONFIG = {
 
     window.closeAllModals = () => {
       closeGameModal();
-      ["redeemModal", "lockerModal", "authModal", "adminModal"].forEach(closeModal);
+      ["redeemModal", "authModal", "adminModal"].forEach(closeModal);
     };
 
     window.closeGameModal = () => {
@@ -1664,7 +3031,6 @@ const FIREBASE_CONFIG = {
       closeModal("gameModal");
     };
 
-    // Prevent arrow/space page scrolling when playing a game
     window.addEventListener("keydown", (e) => {
       if (activeGameId && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space", " "].includes(e.key)) {
         if (document.activeElement.tagName !== "INPUT") {
@@ -1758,11 +3124,11 @@ const FIREBASE_CONFIG = {
     };
 
     // =========================================================================
-    // 10. ALL 18 FULL GAME ENGINES (HIGH-QUALITY 60FPS CANVAS & INTERACTIVE)
+    // 17. ALL 18 FULL GAME ENGINES
     // =========================================================================
     const GAME_ENGINES = {
 
-      // 1. COOKIE EMPIRE (COOKIE CLICKER)
+      // 1. COOKIE EMPIRE
       cookie(stage, hint) {
         hint.textContent = "Click the glowing cookie to bake! Buy buildings & catch Golden Cookies for massive multipliers.";
         let state = JSON.parse(localStorage.getItem("nexus_cookie_save") || "null") || {
@@ -1870,7 +3236,7 @@ const FIREBASE_CONFIG = {
         };
       },
 
-      // 2. NEON DRIFT (TOP-DOWN HIGHWAY CAR RACER)
+      // 2. NEON DRIFT
       drift(stage, hint) {
         hint.textContent = "Use LEFT / RIGHT Arrows (or A / D) to steer, UP / SPACE for Nitro Boost. Collect coins & dodge traffic!";
         const canvas = document.createElement("canvas");
@@ -1918,7 +3284,6 @@ const FIREBASE_CONFIG = {
             pickups.push({ x: 95 + Math.floor(Math.random() * 4) * 95, y: -30 });
           }
 
-          // Background & Road
           ctx.fillStyle = "#060913"; ctx.fillRect(0, 0, 480, 500);
           ctx.fillStyle = "#111827"; ctx.fillRect(60, 0, 360, 500);
           ctx.strokeStyle = sk.color; ctx.lineWidth = 4;
@@ -1931,7 +3296,6 @@ const FIREBASE_CONFIG = {
           });
           ctx.setLineDash([]);
 
-          // Nitro flame particles
           if (boosting) {
             particles.push({ x: carX + (Math.random() - 0.5) * 14, y: 432, vy: 5, life: 14 });
           }
@@ -1943,7 +3307,6 @@ const FIREBASE_CONFIG = {
             if (p.life <= 0) particles.splice(i, 1);
           }
 
-          // Pickups
           for (let i = pickups.length - 1; i >= 0; i--) {
             const c = pickups[i];
             c.y += curSpeed * 1.4;
@@ -1956,7 +3319,6 @@ const FIREBASE_CONFIG = {
             } else if (c.y > 530) pickups.splice(i, 1);
           }
 
-          // Traffic
           for (let i = traffic.length - 1; i >= 0; i--) {
             const t = traffic[i];
             t.y += curSpeed * 1.15;
@@ -1987,7 +3349,6 @@ const FIREBASE_CONFIG = {
             if (t.y > 550) traffic.splice(i, 1);
           }
 
-          // Player Car
           ctx.save();
           ctx.shadowColor = sk.color; ctx.shadowBlur = 18;
           ctx.fillStyle = sk.color;
@@ -2000,7 +3361,6 @@ const FIREBASE_CONFIG = {
           }
           ctx.restore();
 
-          // HUD
           ctx.fillStyle = "#fff"; ctx.font = "700 15px JetBrains Mono"; ctx.textAlign = "left";
           ctx.fillText(`DIST: ${Math.floor(score)}m`, 16, 28);
           ctx.fillStyle = "#fbbf24"; ctx.fillText(`COINS: +${coinsRun}`, 16, 50);
@@ -2017,7 +3377,7 @@ const FIREBASE_CONFIG = {
         };
       },
 
-      // 3. CYBER RALLY 3D (PSEUDO-3D HORIZON RACER)
+      // 3. CYBER RALLY 3D
       rally(stage, hint) {
         hint.textContent = "LEFT / RIGHT Arrows to steer around corners, UP Arrow to accelerate. Beat the clock & pass rivals!";
         const canvas = document.createElement("canvas");
@@ -2053,16 +3413,13 @@ const FIREBASE_CONFIG = {
           score += speed * 0.15;
           if (frame % 90 === 0) GameAPI.addCoins(3);
 
-          // Sky
           const grad = ctx.createLinearGradient(0, 0, 0, 220);
           grad.addColorStop(0, "#050714"); grad.addColorStop(1, "#1e1b4b");
           ctx.fillStyle = grad; ctx.fillRect(0, 0, 640, 220);
 
-          // Sun
           ctx.fillStyle = "#f43f5e";
           ctx.beginPath(); ctx.arc(320 - curve * 45, 165, 52, 0, Math.PI * 2); ctx.fill();
 
-          // Pseudo-3D Road Scanlines
           for (let y = 220; y < 440; y++) {
             const p = (y - 220) / 220;
             const z = 1 / (p + 0.05);
@@ -2085,7 +3442,6 @@ const FIREBASE_CONFIG = {
             }
           }
 
-          // Rivals
           rivals.forEach(r => {
             r.z -= speed * 0.65;
             if (r.z < 20) {
@@ -2111,7 +3467,6 @@ const FIREBASE_CONFIG = {
             }
           });
 
-          // Player Car
           ctx.save();
           ctx.shadowColor = sk.color; ctx.shadowBlur = 16;
           ctx.fillStyle = sk.color;
@@ -2328,7 +3683,7 @@ const FIREBASE_CONFIG = {
         return () => { clearInterval(dropTimer); window.removeEventListener("keydown", onKey); };
       },
 
-      // 6. SKY FLAP (FLAPPY BIRD)
+      // 6. SKY FLAP
       flappy(stage, hint) {
         hint.textContent = "Click canvas or press SPACE / UP Arrow to flap through neon laser gates!";
         const canvas = document.createElement("canvas");
@@ -2497,7 +3852,7 @@ const FIREBASE_CONFIG = {
         return () => cancelAnimationFrame(raf);
       },
 
-      // 8. STAR VANGUARD (SPACE INVADERS)
+      // 8. STAR VANGUARD
       invaders(stage, hint) {
         hint.textContent = "LEFT / RIGHT Arrows to fly, SPACE to fire plasma bolts!";
         const canvas = document.createElement("canvas");
@@ -2676,7 +4031,7 @@ const FIREBASE_CONFIG = {
         return () => window.removeEventListener("keydown", onKey);
       },
 
-      // 10. CYBER SWEEPER (MINESWEEPER)
+      // 10. CYBER SWEEPER
       minesweeper(stage, hint) {
         hint.textContent = "Left-click to reveal safe cells, Right-click to place a Danger Flag!";
         const R = 10, C = 12, MINES = 16;
@@ -2803,7 +4158,7 @@ const FIREBASE_CONFIG = {
         return () => cancelAnimationFrame(raf);
       },
 
-      // 12. MAZE RUNNER (PAC-MAZE)
+      // 12. MAZE RUNNER
       pacman(stage, hint) {
         hint.textContent = "Use Arrow Keys to navigate the neon maze, collect all energy dots & avoid ghosts!";
         const canvas = document.createElement("canvas");
@@ -3298,11 +4653,20 @@ const FIREBASE_CONFIG = {
     };
 
     // =========================================================================
-    // 11. BOOTSTRAP
+    // 18. BOOTSTRAP
     // =========================================================================
+    populateLeaderboardSelect();
     populateAdminDropdowns();
     updateHud();
+    updateAuthUI();
+    updateRedeemModalUI();
     renderGameGrid();
+    renderShopView();
+    fetchAllPlayers().then(() => {
+      renderLeaderboardView();
+      renderFriendsView();
+      subscribeToChatMessages();
+    });
   </script>
 </body>
 </html>
