@@ -1011,8 +1011,10 @@
 
           <div class="chat-feed" id="chatMessagesFeed"></div>
 
+          <div id="chatTypingIndicator" style="min-height:1.4rem; padding:0.2rem 1rem; font-size:0.78rem; color:var(--accent-cyan); font-style:italic; display:flex; align-items:center; gap:0.4rem;"></div>
+
           <div class="chat-input-bar">
-            <input type="text" id="chatMessageInput" class="form-control" placeholder="Write a message..." onkeydown="if(event.key==='Enter') sendChatMessage()" />
+            <input type="text" id="chatMessageInput" class="form-control" placeholder="Write a message..." oninput="handleChatTyping()" onkeydown="if(event.key==='Enter') sendChatMessage()" />
             <button class="btn btn-primary" onclick="sendChatMessage()">Send ➤</button>
           </div>
         </div>
@@ -2407,6 +2409,92 @@
       return [uidA, uidB].sort().join("__");
     }
 
+    let unsubTyping = null;
+    let typingUsersCache = [];
+    let lastTypingWriteAt = 0;
+    let typingStopTimer = null;
+
+    function getActiveChatRoomId() {
+      const myUid = currentUser ? currentUser.uid : userProfile.uid;
+      return activeChatThread === "global" ? "global" : getDmRoomId(myUid, activeChatThread);
+    }
+
+    function renderTypingIndicator() {
+      const el = document.getElementById("chatTypingIndicator");
+      if (!el) return;
+      const myUid = currentUser ? currentUser.uid : userProfile.uid;
+      const roomId = getActiveChatRoomId();
+      const now = Date.now();
+      const activeTypers = typingUsersCache.filter(t =>
+        t.roomId === roomId &&
+        t.uid !== myUid &&
+        (now - (t.updatedAt || 0)) < 4500
+      );
+      if (activeTypers.length === 0) {
+        el.innerHTML = "";
+        return;
+      }
+      const names = activeTypers.map(t => escapeHtml(t.name || "Player"));
+      const label = names.length === 1
+        ? `${names[0]} is typing...`
+        : `${names.slice(0, 2).join(", ")} are typing...`;
+      el.innerHTML = `<span class="status-dot online" style="width:7px; height:7px;"></span><span>${label}</span>`;
+    }
+
+    setInterval(renderTypingIndicator, 1000);
+
+    function subscribeToTypingStatus() {
+      if (unsubTyping) {
+        try { unsubTyping(); } catch (e) {}
+        unsubTyping = null;
+      }
+      if (!db || !currentUser) return;
+      try {
+        unsubTyping = onSnapshot(collection(db, "typing_status"), (snap) => {
+          const list = [];
+          snap.forEach(d => list.push(d.data()));
+          typingUsersCache = list;
+          renderTypingIndicator();
+        }, () => {});
+      } catch (e) {}
+    }
+
+    async function clearChatTyping(roomId) {
+      if (typingStopTimer) {
+        clearTimeout(typingStopTimer);
+        typingStopTimer = null;
+      }
+      lastTypingWriteAt = 0;
+      if (!db || !currentUser) return;
+      const targetRoom = roomId || getActiveChatRoomId();
+      try {
+        await deleteDoc(doc(db, "typing_status", `${targetRoom}__${currentUser.uid}`));
+      } catch (e) {}
+    }
+
+    window.handleChatTyping = () => {
+      if (!db || !currentUser) return;
+      const input = document.getElementById("chatMessageInput");
+      const roomId = getActiveChatRoomId();
+      if (!input || !input.value.trim()) {
+        clearChatTyping(roomId);
+        return;
+      }
+      const now = Date.now();
+      if (now - lastTypingWriteAt > 1800) {
+        lastTypingWriteAt = now;
+        const myName = userProfile.displayName || (currentUser.email ? currentUser.email.split("@")[0] : "Player");
+        setDoc(doc(db, "typing_status", `${roomId}__${currentUser.uid}`), {
+          roomId,
+          uid: currentUser.uid,
+          name: myName,
+          updatedAt: now
+        }).catch(() => {});
+      }
+      if (typingStopTimer) clearTimeout(typingStopTimer);
+      typingStopTimer = setTimeout(() => clearChatTyping(roomId), 3200);
+    };
+
     function subscribeToChatMessages() {
       if (unsubChat) {
         try { unsubChat(); } catch (e) {}
@@ -2418,14 +2506,17 @@
         renderChatMessages();
         return;
       }
+      subscribeToTypingStatus();
       try {
-        const q = query(collection(db, "messages"), orderBy("timestamp", "asc"), limit(200));
+        const q = query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(200));
         unsubChat = onSnapshot(q, (snap) => {
           const list = [];
-          snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+          snap.forEach(d => list.push({ ...d.data(), id: d.id }));
+          list.reverse();
           chatMessagesCache = list;
           saveLocalMessages(list);
           renderChatMessages();
+          if (document.getElementById("adminChatModList")) renderAdminModeration();
         }, (err) => {
           console.warn("Chat snapshot fallback:", err.message);
           chatMessagesCache = loadLocalMessages();
@@ -2438,9 +2529,11 @@
     }
 
     window.selectChatThread = (threadId) => {
+      clearChatTyping(getActiveChatRoomId());
       activeChatThread = threadId;
       renderChatThreads();
       renderChatMessages();
+      renderTypingIndicator();
     };
 
     function renderChatThreads() {
@@ -2531,7 +2624,6 @@
       const myUid = currentUser ? currentUser.uid : userProfile.uid;
       const roomId = activeChatThread === "global" ? "global" : getDmRoomId(myUid, activeChatThread);
       const msgObj = {
-        id: "msg_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
         roomId,
         senderUid: myUid,
         senderEmail: currentUser ? currentUser.email : "guest@local",
@@ -2542,16 +2634,21 @@
       };
 
       input.value = "";
-      chatMessagesCache.push(msgObj);
+      clearChatTyping(roomId);
+      const tempLocal = { ...msgObj, id: "temp_" + Date.now() };
+      chatMessagesCache.push(tempLocal);
       saveLocalMessages(chatMessagesCache);
       renderChatMessages();
 
       if (db && currentUser) {
         try {
-          await addDoc(collection(db, "messages"), msgObj);
-        } catch (e) {}
+          const ref = await addDoc(collection(db, "messages"), msgObj);
+          tempLocal.id = ref.id;
+        } catch (e) {
+          showToast("⚠️ Message failed to send: " + e.message);
+        }
       }
-      await logPlayerAction("CHAT", `Sent message in [${roomId}]: "${text.slice(0, 60)}"`);
+      logPlayerAction("CHAT", `Sent message in [${roomId}]: "${text.slice(0, 60)}"`);
     };
 
     window.addEventListener("storage", (e) => {
@@ -2986,12 +3083,19 @@
       if (!checkIsAdmin(currentUser)) return;
       chatMessagesCache = chatMessagesCache.filter(m => m.id !== msgId);
       saveLocalMessages(chatMessagesCache);
-      if (db && currentUser) {
-        try { await deleteDoc(doc(db, "messages", msgId)); } catch (e) {}
-      }
-      await logPlayerAction("ADMIN", `Deleted chat message (${msgId})`);
       renderAdminModeration();
       renderChatMessages();
+      if (db && currentUser) {
+        try {
+          await deleteDoc(doc(db, "messages", msgId));
+          const legacySnap = await getDocs(query(collection(db, "messages"), where("id", "==", msgId)));
+          legacySnap.forEach(d => deleteDoc(doc(db, "messages", d.id)).catch(() => {}));
+        } catch (e) {
+          showToast("⚠️ Failed to delete message: " + e.message);
+          return;
+        }
+      }
+      logPlayerAction("ADMIN", `Deleted chat message (${msgId})`);
       showToast("🗑️ Message deleted.");
     };
 
