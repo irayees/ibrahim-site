@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ViewIn Canvas Theater — In-Car Streaming &amp; Live TV</title>
+  <meta name="theme-color" content="#090b0e" />
+  <script>
+    // Automatic Tesla Fullscreen Redirect if accessed with ?rd=1 or #rd
+    (function () {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('rd') === '1' || window.location.hash === '#rd') {
+          var clean = new URL(window.location.href);
+          clean.searchParams.delete('rd');
+          clean.hash = '';
+          window.location.replace('https://www.youtube.com/redirect?q=' + encodeURIComponent(clean.toString()));
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mpegts.js@1.7.3/dist/mpegts.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #090b0e;
+      color: #f3f4f6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      overscroll-behavior-y: none;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d1015;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #272d38;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3b4454;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .theater-aspect {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      overflow: hidden;
+    }
+    .cinema-mode .theater-col {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .cinema-mode .theater-aspect {
+      height: calc(100vh - 64px);
+      aspect-ratio: auto;
+    }
+    /* Off-screen decoder video: kept 2x2 with opacity 0.01 so Chromium continuously decodes frames without triggering video-overlay lock */
+    .offscreen-decoder-video {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 2px;
+      height: 2px;
+      opacity: 0.01;
+      pointer-events: none;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#090b0e] text-gray-100 select-none">
+
+  <!-- Hidden Off-Screen Video Decoder for Canvas Rendering -->
+  <video id="decoderVideo" class="offscreen-decoder-video" playsinline webkit-playsinline preload="auto"></video>
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-[#0d1015]/95 backdrop-blur-md border-b border-[#1f242e] px-3 sm:px-5 py-2.5">
+    <div class="max-w-[1800px] mx-auto flex items-center justify-between gap-3">
+      <!-- Brand -->
+      <div class="flex items-center gap-3 shrink-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e82127] to-[#991b1b] flex items-center justify-center shadow-lg shadow-red-950/40">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-lg tracking-tight text-white">ViewIn<span class="text-[#00d2ff]">Canvas</span></span>
+            <span id="canvasStatusPill" class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Canvas Image Render
+            </span>
+          </div>
+          <div id="clockDisplay" class="text-xs text-gray-400 font-medium">--:--</div>
+        </div>
+      </div>
+
+      <!-- Source Tabs -->
+      <nav class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+        <button data-tab="livetv" class="source-tab min-h-[46px] px-4 rounded-xl font-bold text-sm flex items-center gap-2 transition whitespace-nowrap bg-[#00d2ff] text-black">
+          <span>📺</span><span>Live TV</span>
+        </button>
+        <button data-tab="iptv" class="source-tab min-h-[46px] px-4 rounded-xl font-bold text-sm flex items-center gap-2 transition whitespace-nowrap bg-[#151921] text-gray-300 hover:bg-[#1e2430] border border-[#242a36]">
+          <span>📡</span><span>IPTV Playlists</span>
+        </button>
+        <button data-tab="cloud" class="source-tab min-h-[46px] px-4 rounded-xl font-bold text-sm flex items-center gap-2 transition whitespace-nowrap bg-[#151921] text-gray-300 hover:bg-[#1e2430] border border-[#242a36]">
+          <span>☁️</span><span>Direct Video / MP4</span>
+        </button>
+        <button data-tab="youtube" class="source-tab min-h-[46px] px-4 rounded-xl font-bold text-sm flex items-center gap-2 transition whitespace-nowrap bg-[#151921] text-gray-300 hover:bg-[#1e2430] border border-[#242a36]">
+          <span>▶️</span><span>YouTube</span>
+        </button>
+        <button data-tab="twitch" class="source-tab min-h-[46px] px-4 rounded-xl font-bold text-sm flex items-center gap-2 transition whitespace-nowrap bg-[#151921] text-gray-300 hover:bg-[#1e2430] border border-[#242a36]">
+          <span>🟣</span><span>Twitch</span>
+        </button>
+      </nav>
+
+      <!-- Tesla Park Fullscreen Button -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button id="teslaFullscreenBtn" title="Open in Tesla Edge-to-Edge Park Theater (youtube.com/redirect)" class="min-h-[46px] px-3.5 sm:px-4 rounded-xl bg-[#151921] hover:bg-[#1e2430] active:scale-95 border border-[#262d3a] hover:border-[#00d2ff]/50 text-gray-100 font-bold text-xs sm:text-sm flex items-center gap-2 transition">
+          <svg class="w-4 h-4 text-[#00d2ff]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+          <span class="hidden md:inline">Tesla Fullscreen</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Single-Screen Split Workspace -->
+  <main class="flex-1 max-w-[1800px] w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+    <!-- LEFT / TOP: Persistent 16:9 Canvas Theater Player (7 cols on lg) -->
+    <section class="theater-col lg:col-span-7 bg-[#0f1319] border border-[#1f242e] rounded-2xl overflow-hidden shadow-2xl">
+      <!-- Viewport -->
+      <div id="theaterViewport" class="theater-aspect relative group">
+        <!-- HTML5 Canvas Surface (Renders video frames as a live image sequence) -->
+        <canvas id="theaterCanvas" class="w-full h-full block bg-black cursor-pointer hidden"></canvas>
+
+        <!-- Cross-origin Iframe Fallback (Used only for YouTube / Twitch / Google Drive) -->
+        <iframe id="embedIframePlayer" class="w-full h-full border-0 bg-black hidden" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+
+        <!-- Custom Touch Controls Overlay on Canvas -->
+        <div id="canvasOverlayControls" class="hidden absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent px-4 pt-8 pb-3 flex flex-col gap-2 transition-opacity duration-200">
+          <!-- Seek Bar (for VOD / MP4) -->
+          <div id="seekBarContainer" class="hidden items-center gap-2.5">
+            <span id="currentTimeLabel" class="text-[11px] font-mono text-gray-300 w-10 text-right">0:00</span>
+            <input id="canvasSeekSlider" type="range" min="0" max="100" value="0" step="0.1" class="flex-1 accent-[#00d2ff] h-1.5 bg-white/20 rounded-lg cursor-pointer" />
+            <span id="durationLabel" class="text-[11px] font-mono text-gray-300 w-10">0:00</span>
+          </div>
+
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <button id="canvasPlayPauseBtn" class="min-h-[42px] min-w-[46px] px-3 rounded-xl bg-white/15 hover:bg-white/25 text-white font-extrabold text-sm flex items-center justify-center backdrop-blur-sm">
+                ⏸
+              </button>
+              <button id="canvasMuteBtn" class="min-h-[42px] min-w-[46px] px-3 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm flex items-center justify-center backdrop-blur-sm">
+                🔊
+              </button>
+              <input id="canvasVolumeSlider" type="range" min="0" max="1" step="0.05" value="1" class="w-20 sm:w-28 accent-[#00d2ff] h-1.5 bg-white/20 rounded-lg cursor-pointer" />
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span id="fpsCounterBadge" class="text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg bg-black/60 border border-emerald-500/40 text-emerald-400">
+                CANVAS • 0 FPS
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Idle / Loading Placeholder -->
+        <div id="playerPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-gradient-to-b from-[#111620] to-[#080a0d]">
+          <div class="w-16 h-16 rounded-2xl bg-[#181e29] border border-[#2a3242] flex items-center justify-center mb-3 text-3xl">
+            🖼️
+          </div>
+          <h2 class="text-lg sm:text-xl font-extrabold text-white">Canvas Image-Stream Theater</h2>
+          <p class="text-xs sm:text-sm text-gray-400 max-w-md mt-1">
+            Streams HLS Live TV, IPTV, and MP4 videos frame-by-frame onto an HTML5 <code class="text-[#00d2ff]">&lt;canvas&gt;</code> with auto-resume watchdog so playback stays smooth in Drive.
+          </p>
+        </div>
+
+        <!-- Buffering Spinner Overlay -->
+        <div id="playerSpinner" class="hidden absolute inset-0 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center pointer-events-none">
+          <div class="w-11 h-11 border-4 border-[#00d2ff]/30 border-t-[#00d2ff] rounded-full animate-spin"></div>
+          <span id="spinnerText" class="mt-3 text-xs font-bold tracking-wide text-gray-200">Rendering frames to canvas...</span>
+        </div>
+      </div>
+
+      <!-- Player Control Bar -->
+      <div class="bg-[#12161e] border-t border-[#1f242e] px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2">
+            <span id="nowPlayingBadge" class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-[#00d2ff]/15 text-[#00d2ff] border border-[#00d2ff]/30 shrink-0">IDLE</span>
+            <h1 id="nowPlayingTitle" class="font-bold text-sm sm:text-base text-white truncate">No stream active</h1>
+          </div>
+          <p id="nowPlayingMeta" class="text-xs text-gray-400 truncate mt-0.5">Select any Live TV channel on the right to start Canvas playback</p>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- Favorite Current Button -->
+          <button id="favCurrentBtn" title="Favorite current stream" class="min-h-[42px] px-3 rounded-xl bg-[#1a202c] hover:bg-[#232b3b] border border-[#2a3344] text-gray-200 text-xs font-bold flex items-center gap-1.5 transition">
+            <span id="favCurrentIcon">☆</span>
+            <span class="hidden sm:inline">Favorite</span>
+          </button>
+
+          <!-- LTE Quality Switcher (HLS) -->
+          <div id="qualityWrapper" class="hidden items-center gap-1.5 bg-[#1a202c] border border-[#2a3344] rounded-xl px-2.5 min-h-[42px]">
+            <span class="text-[11px] font-bold text-[#00d2ff]">LTE</span>
+            <select id="hlsQualitySelect" class="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer">
+              <option value="-1" class="bg-[#12161e]">Auto</option>
+            </select>
+          </div>
+
+          <!-- Reload Stream -->
+          <button id="reloadStreamBtn" title="Reload stream" class="min-h-[42px] px-3 rounded-xl bg-[#1a202c] hover:bg-[#232b3b] border border-[#2a3344] text-gray-200 text-xs font-bold transition">
+            ↻ Reload
+          </button>
+
+          <!-- Cinema Expand -->
+          <button id="cinemaExpandBtn" title="Toggle Cinema Expand" class="min-h-[42px] px-3 rounded-xl bg-[#00d2ff]/15 hover:bg-[#00d2ff]/25 border border-[#00d2ff]/40 text-[#00d2ff] text-xs font-extrabold transition">
+            ⛶ Cinema
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT / BOTTOM: Dynamic Source Browser & Controls (5 cols on lg) -->
+    <section class="lg:col-span-5 bg-[#0f1319] border border-[#1f242e] rounded-2xl p-3.5 sm:p-4 flex flex-col gap-3.5">
+
+      <!-- TAB 1: LIVE TV (Direct Canvas HLS Streams + Pluto TV) -->
+      <div id="panel-livetv" class="source-panel flex flex-col gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="font-extrabold text-base text-white">Live TV (Canvas Mode)</h2>
+            <p id="liveTvCountLabel" class="text-xs text-gray-400">Ready</p>
+          </div>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button data-pluto="news" class="pluto-region-btn min-h-[38px] px-3 rounded-lg text-xs font-extrabold bg-[#00d2ff] text-black">24/7 News</button>
+            <button data-pluto="us" class="pluto-region-btn min-h-[38px] px-3 rounded-lg text-xs font-bold bg-[#171c26] text-gray-300 hover:bg-[#202736] border border-[#262e3d]">Pluto US</button>
+            <button data-pluto="uk" class="pluto-region-btn min-h-[38px] px-3 rounded-lg text-xs font-bold bg-[#171c26] text-gray-300 hover:bg-[#202736] border border-[#262e3d]">Pluto UK</button>
+            <button data-pluto="freetv" class="pluto-region-btn min-h-[38px] px-3 rounded-lg text-xs font-bold bg-[#171c26] text-gray-300 hover:bg-[#202736] border border-[#262e3d]">Free-TV</button>
+          </div>
+        </div>
+
+        <!-- Search + Favorites Filter -->
+        <div class="flex items-center gap-2">
+          <input id="liveTvSearchInput" type="search" placeholder="Search Live TV channels..." class="flex-1 min-h-[46px] px-3.5 rounded-xl bg-[#090b0e] border border-[#242b38] text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#00d2ff]" />
+          <button id="liveTvFavOnlyBtn" class="min-h-[46px] px-3.5 rounded-xl bg-[#171c26] border border-[#262e3d] text-xs font-bold text-gray-300 hover:text-white transition whitespace-nowrap">
+            ★ Favorites
+          </button>
+        </div>
+
+        <!-- Category Chips -->
+        <div id="liveTvCategoryBar" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5"></div>
+
+        <!-- Channel List -->
+        <div id="liveTvChannelList" class="max-h-[540px] overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2"></div>
+      </div>
+
+      <!-- TAB 2: IPTV PLAYLISTS (Canvas HLS / TS) -->
+      <div id="panel-iptv" class="source-panel hidden flex-col gap-3">
+        <div>
+          <h2 class="font-extrabold text-base text-white">IPTV Playlists (Canvas Mode)</h2>
+          <p class="text-xs text-gray-400">All .m3u / .m3u8 / .ts streams render directly via HTML5 Canvas</p>
+        </div>
+
+        <!-- One-Click Public Packs -->
+        <div class="flex flex-wrap gap-1.5">
+          <button data-iptv-pack="https://iptv-org.github.io/iptv/categories/news.m3u" class="iptv-pack-btn min-h-[38px] px-3 rounded-lg bg-[#171c26] hover:bg-[#202736] border border-[#262e3d] text-xs font-bold text-gray-200">📰 News</button>
+          <button data-iptv-pack="https://iptv-org.github.io/iptv/categories/sports.m3u" class="iptv-pack-btn min-h-[38px] px-3 rounded-lg bg-[#171c26] hover:bg-[#202736] border border-[#262e3d] text-xs font-bold text-gray-200">⚽ Sports</button>
+          <button data-iptv-pack="https://iptv-org.github.io/iptv/categories/movies.m3u" class="iptv-pack-btn min-h-[38px] px-3 rounded-lg bg-[#171c26] hover:bg-[#202736] border border-[#262e3d] text-xs font-bold text-gray-200">🎬 Movies</button>
+          <button data-iptv-pack="https://iptv-org.github.io/iptv/categories/music.m3u" class="iptv-pack-btn min-h-[38px] px-3 rounded-lg bg-[#171c26] hover:bg-[#202736] border border-[#262e3d] text-xs font-bold text-gray-200">🎵 Music</button>
+          <button data-iptv-pack="https://iptv-org.github.io/iptv/countries/us.m3u" class="iptv-pack-btn min-h-[38px] px-3 rounded-lg bg-[#171c26] hover:bg-[#202736] border border-[#262e3d] text-xs font-bold text-gray-200">🇺🇸 USA</button>
+          <button data-iptv-pack="https://iptv-org.github.io/iptv/countries/uk.m3u" class="iptv-pack-btn min-h-[38px] px-3 rounded-lg bg-[#171c26] hover:bg-[#202736] border border-[#262e3d] text-xs font-bold text-gray-200">🇬🇧 UK</button>
+          <button data-iptv-pack="https://iptv-org.github.io/iptv/index.m3u" class="iptv-pack-btn min-h-[38px] px-3 rounded-lg bg-[#00d2ff]/15 hover:bg-[#00d2ff]/25 border border-[#00d2ff]/40 text-xs font-extrabold text-[#00d2ff]">🌍 Worldwide (8,000+)</button>
+        </div>
+
+        <!-- Custom M3U URL / Direct .m3u8 Input -->
+        <div class="flex gap-2">
+          <input id="customM3uUrlInput" type="url" placeholder="Paste .m3u playlist URL or direct .m3u8 / .ts stream..." class="flex-1 min-h-[46px] px-3.5 rounded-xl bg-[#090b0e] border border-[#242b38] text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#00d2ff]" />
+          <button id="loadCustomM3uBtn" class="min-h-[46px] px-4 rounded-xl bg-[#00d2ff] text-black font-extrabold text-xs sm:text-sm whitespace-nowrap">Load</button>
+        </div>
+
+        <!-- Local File Upload + Paste Raw M3U Toggle -->
+        <div class="flex items-center justify-between gap-2 text-xs">
+          <label class="min-h-[40px] px-3 rounded-xl bg-[#171c26] hover:bg-[#202736] border border-[#262e3d] text-gray-200 font-bold flex items-center gap-2 cursor-pointer">
+            <span>📂 Upload .m3u / .m3u8 File</span>
+            <input id="m3uFileInput" type="file" accept=".m3u,.m3u8,.txt" class="hidden" />
+          </label>
+          <button id="toggleRawM3uBtn" class="min-h-[40px] px-3 rounded-xl bg-[#171c26] hover:bg-[#202736] border border-[#262e3d] text-gray-300 font-bold">
+            📋 Paste Raw #EXTM3U
+          </button>
+        </div>
+
+        <div id="rawM3uBox" class="hidden flex-col gap-2">
+          <textarea id="rawM3uTextarea" rows="4" placeholder="#EXTM3U&#10;#EXTINF:-1,My Channel&#10;https://example.com/stream.m3u8" class="w-full p-3 rounded-xl bg-[#090b0e] border border-[#242b38] text-xs font-mono text-gray-200 focus:outline-none focus:border-[#00d2ff]"></textarea>
+          <button id="parseRawM3uBtn" class="min-h-[42px] px-4 rounded-xl bg-emerald-500 text-black font-extrabold text-xs self-end">Parse &amp; Load Playlist</button>
+        </div>
+
+        <!-- Search IPTV Channels -->
+        <input id="iptvSearchInput" type="search" placeholder="Filter loaded IPTV channels..." class="w-full min-h-[44px] px-3.5 rounded-xl bg-[#090b0e] border border-[#242b38] text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#00d2ff]" />
+
+        <div id="iptvStatusLabel" class="text-xs text-gray-400">Select a pack above or load an M3U link.</div>
+        <div id="iptvChannelList" class="max-h-[420px] overflow-y-auto pr-1 flex flex-col gap-1.5"></div>
+      </div>
+
+      <!-- TAB 3: DIRECT VIDEO / MP4 / CLOUD (Canvas Mode) -->
+      <div id="panel-cloud" class="source-panel hidden flex-col gap-3">
+        <div>
+          <h2 class="font-extrabold text-base text-white">Direct Video &amp; Cloud (Canvas Mode)</h2>
+          <p class="text-xs text-gray-400">Direct .mp4 / .webm / .m3u8 URLs render on Canvas with seek scrubbing &amp; auto-resume</p>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <input id="cloudTitleInput" type="text" placeholder="Title (optional, e.g. Roadtrip Movie)" class="w-full min-h-[44px] px-3.5 rounded-xl bg-[#090b0e] border border-[#242b38] text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#00d2ff]" />
+          <div class="flex gap-2">
+            <input id="cloudUrlInput" type="url" placeholder="https://.../video.mp4 or Google Drive share link" class="flex-1 min-h-[48px] px-3.5 rounded-xl bg-[#090b0e] border border-[#242b38] text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#00d2ff]" />
+            <button id="playCloudBtn" class="min-h-[48px] px-4 rounded-xl bg-[#00d2ff] text-black font-extrabold text-sm">Play</button>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Saved Direct &amp; Cloud Videos</span>
+          <button id="saveCloudItemBtn" class="text-xs font-bold text-[#00d2ff] hover:underline">+ Save to List</button>
+        </div>
+
+        <div id="cloudList" class="max-h-[440px] overflow-y-auto pr-1 flex flex-col gap-2"></div>
+      </div>
+
+      <!-- TAB 4: YOUTUBE THEATER -->
+      <div id="panel-youtube" class="source-panel hidden flex-col gap-3">
+        <div>
+          <h2 class="font-extrabold text-base text-white">YouTube Theater</h2>
+          <p class="text-xs text-gray-400">Note: Browser security prevents drawing cross-origin YouTube iframes onto a &lt;canvas&gt;. For uninterrupted driving playback, use the <strong>Live TV</strong> tab (which includes Al Jazeera, Sky News, DW, ABC, CBS, and NASA as direct Canvas HLS streams).</p>
+        </div>
+
+        <div class="flex gap-2">
+          <input id="youtubeUrlInput" type="text" placeholder="https://www.youtube.com/watch?v=... or Video ID" class="flex-1 min-h-[48px] px-3.5 rounded-xl bg-[#090b0e] border border-[#242b38] text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#00d2ff]" />
+          <button id="playYoutubeBtn" class="min-h-[48px] px-4 rounded-xl bg-[#e82127] hover:bg-red-600 text-white font-extrabold text-sm">Play</button>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Saved YouTube Streams</span>
+          <button id="saveYoutubeFavBtn" class="text-xs font-bold text-[#00d2ff] hover:underline">+ Save Current Input</button>
+        </div>
+
+        <div id="youtubeList" class="max-h-[420px] overflow-y-auto pr-1 flex flex-col gap-2"></div>
+      </div>
+
+      <!-- TAB 5: TWITCH LIVE -->
+      <div id="panel-twitch" class="source-panel hidden flex-col gap-3">
+        <div>
+          <h2 class="font-extrabold text-base text-white">Twitch Live Theater</h2>
+          <p class="text-xs text-gray-400">Enter any Twitch channel name or URL</p>
+        </div>
+
+        <div class="flex gap-2">
+          <input id="twitchChannelInput" type="text" placeholder="e.g. shroud, LofiGirl, NASA, or twitch.tv/..." class="flex-1 min-h-[48px] px-3.5 rounded-xl bg-[#090b0e] border border-[#242b38] text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#9146ff]" />
+          <button id="playTwitchBtn" class="min-h-[48px] px-4 rounded-xl bg-[#9146ff] hover:bg-purple-600 text-white font-extrabold text-sm">Watch</button>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Popular &amp; Saved Channels</span>
+          <button id="saveTwitchFavBtn" class="text-xs font-bold text-[#00d2ff] hover:underline">+ Save Channel</button>
+        </div>
+
+        <div id="twitchList" class="max-h-[480px] overflow-y-auto pr-1 flex flex-col gap-2"></div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 hidden max-w-sm px-4 py-3 rounded-xl bg-[#161b24] border border-[#2d3646] text-sm font-semibold text-white shadow-2xl"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* --------------------------------------------------------------------
+         1. CONSTANTS & CURATED DIRECT HLS / CANVAS STREAMS
+      -------------------------------------------------------------------- */
+      const STORAGE = {
+        FAVORITES: 'viewin_canvas_favorites_v1',
+        YOUTUBE: 'viewin_canvas_youtube_v1',
+        TWITCH: 'viewin_canvas_twitch_v1',
+        CLOUD: 'viewin_canvas_cloud_v1'
+      };
+
+      const PLUTO_SOURCES = {
+        news: { label: '24/7 Direct News & TV', url: null },
+        us: { label: 'Pluto US', url: 'https://raw.githubusercontent.com/i-m-a-d/pluto-iptv/main/pluto_us.m3u' },
+        uk: { label: 'Pluto UK', url: 'https://raw.githubusercontent.com/i-m-a-d/pluto-iptv/main/pluto_uk.m3u' },
+        freetv: { label: 'Free-TV Global', url: 'https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8' }
+      };
+
+      // Direct HLS (.m3u8) streams that render smoothly onto HTML5 <canvas>
+      const DIRECT_CANVAS_LIVE_CHANNELS = [
+        { id: 'hls-aljazeera', name: 'Al Jazeera English (Live HLS)', group: 'News', logo: '', url: 'https://live-hls-web-aje.getaj.net/AJE/index.m3u8' },
+        { id: 'hls-sky', name: 'Sky News Live', group: 'News', logo: '', url: 'https://linear901-oo-hls0-prd-ak.delivery.skycdp.com/1750/s/master.m3u8' },
+        { id: 'hls-abc', name: 'ABC News Live', group: 'News', logo: '', url: 'https://content.uplynk.com/channel/3324f2467c414329b3b0cc5cd987b6be.m3u8' },
+        { id: 'hls-cbs', name: 'CBS News 24/7', group: 'News', logo: '', url: 'https://cbsn-us.cbsnstream.cbsnews.com/out/v1/55a8648e8f134e82a470f83d562deeca/master.m3u8' },
+        { id: 'hls-dw', name: 'DW English News', group: 'News', logo: '', url: 'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8' },
+        { id: 'hls-france24', name: 'France 24 English', group: 'News', logo: '', url: 'https://stream.france24.com/hls/live/2037218/F24_EN_HI_HLS/master.m3u8' },
+        { id: 'hls-nasa', name: 'NASA TV Public', group: 'Science', logo: '', url: 'https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master.m3u8' },
+        { id: 'hls-redbull', name: 'Red Bull TV', group: 'Sports', logo: '', url: 'https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8' },
+        { id: 'hls-bloomberg', name: 'Bloomberg TV+', group: 'Business', logo: '', url: 'https://bloomberg.com/media-manifest/streams/phoenix-us.m3u8' },
+        { id: 'hls-nhk', name: 'NHK World Japan', group: 'News', logo: '', url: 'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index.m3u8' }
+      ];
+
+      const DEFAULT_YOUTUBE_ITEMS = [
+        { id: 'yt-lofi', title: 'Lofi Girl — 24/7 Beats to Relax/Study', videoId: 'jfKfPfyJRdk' },
+        { id: 'yt-nasa', title: 'NASA Live — Earth From Space (ISS)', videoId: 'xRPjKQtRXR8' },
+        { id: 'yt-sky', title: 'Sky News — Live 24/7 Stream', videoId: 'YDvsBbKfLPA' },
+        { id: 'yt-aljazeera', title: 'Al Jazeera English — Live', videoId: 'gCNeDWCI0vo' }
+      ];
+
+      const DEFAULT_TWITCH_CHANNELS = [
+        { channel: 'LofiGirl', label: 'LofiGirl — Chill Beats 24/7' },
+        { channel: 'NASA', label: 'NASA Official Live' },
+        { channel: 'Monstercat', label: 'Monstercat — 24/7 Electronic Music' },
+        { channel: 'BobRoss', label: 'Bob Ross — The Joy of Painting' }
+      ];
+
+      const DEFAULT_CLOUD_ITEMS = [
+        { title: 'Big Buck Bunny (1080p Canvas MP4)', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
+        { title: 'Tears of Steel (Sci-Fi Short Canvas MP4)', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
+        { title: 'Sintel (Open Movie Canvas MP4)', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4' }
+      ];
+
+      /* --------------------------------------------------------------------
+         2. APPLICATION STATE & CANVAS RENDER ENGINE STATE
+      -------------------------------------------------------------------- */
+      const state = {
+        activeTab: 'livetv',
+        plutoRegion: 'news',
+        liveChannels: [...DIRECT_CANVAS_LIVE_CHANNELS],
+        liveCategory: 'All',
+        liveSearch: '',
+        liveFavOnly: false,
+        iptvChannels: [],
+        iptvSearch: '',
+        favorites: [],
+        youtubeItems: [],
+        twitchItems: [],
+        cloudItems: [],
+        currentStream: null,
+        hlsInstance: null,
+        mpegtsInstance: null,
+        cinemaExpanded: false,
+        // Canvas Image-Render Loop State
+        isCanvasActive: false,
+        userPaused: false,
+        rafId: null,
+        watchdogTimer: null,
+        framesRendered: 0,
+        lastFpsTimestamp: performance.now(),
+        currentFps: 0
+      };
+
+      /* --------------------------------------------------------------------
+         3. STORAGE & HELPERS
+      -------------------------------------------------------------------- */
+      function loadStoredData() {
+        try {
+          state.favorites = JSON.parse(localStorage.getItem(STORAGE.FAVORITES)) || [];
+          state.youtubeItems = JSON.parse(localStorage.getItem(STORAGE.YOUTUBE)) || [...DEFAULT_YOUTUBE_ITEMS];
+          state.twitchItems = JSON.parse(localStorage.getItem(STORAGE.TWITCH)) || [...DEFAULT_TWITCH_CHANNELS];
+          state.cloudItems = JSON.parse(localStorage.getItem(STORAGE.CLOUD)) || [...DEFAULT_CLOUD_ITEMS];
+        } catch (e) {
+          state.favorites = [];
+          state.youtubeItems = [...DEFAULT_YOUTUBE_ITEMS];
+          state.twitchItems = [...DEFAULT_TWITCH_CHANNELS];
+          state.cloudItems = [...DEFAULT_CLOUD_ITEMS];
+        }
+      }
+
+      function saveStoredData() {
+        try {
+          localStorage.setItem(STORAGE.FAVORITES, JSON.stringify(state.favorites));
+          localStorage.setItem(STORAGE.YOUTUBE, JSON.stringify(state.youtubeItems));
+          localStorage.setItem(STORAGE.TWITCH, JSON.stringify(state.twitchItems));
+          localStorage.setItem(STORAGE.CLOUD, JSON.stringify(state.cloudItems));
+        } catch (e) {}
+      }
+
+      function showToast(msg) {
+        const el = document.getElementById('toastBanner');
+        el.textContent = msg;
+        el.classList.remove('hidden');
+        clearTimeout(el._timer);
+        el._timer = setTimeout(() => el.classList.add('hidden'), 3200);
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function formatTime(sec) {
+        if (!isFinite(sec) || sec < 0) return '0:00';
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return m + ':' + (s < 10 ? '0' : '') + s;
+      }
+
+      /* --------------------------------------------------------------------
+         4. M3U / M3U8 PARSER
+      -------------------------------------------------------------------- */
+      function parseM3U(text) {
+        const lines = text.split(/\r?\n/);
+        const channels = [];
+        let pendingMeta = null;
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
+          if (line.startsWith('#EXTINF:')) {
+            const nameMatch = line.match(/,(.*)$/);
+            const logoMatch = line.match(/tvg-logo="([^"]*)"/i);
+            const groupMatch = line.match(/group-title="([^"]*)"/i);
+
+            pendingMeta = {
+              name: nameMatch ? nameMatch[1].trim() : 'Unnamed Channel',
+              logo: logoMatch ? logoMatch[1].trim() : '',
+              group: (groupMatch && groupMatch[1].trim()) ? groupMatch[1].trim() : 'General'
+            };
+          } else if (!line.startsWith('#')) {
+            const url = line;
+            if (/^https?:\/\//i.test(url)) {
+              const title = pendingMeta ? pendingMeta.name : url.split('/').pop().split('?')[0] || 'Live Stream';
+              channels.push({
+                id: 'ch-' + channels.length + '-' + title.slice(0, 12),
+                name: title,
+                logo: pendingMeta ? pendingMeta.logo : '',
+                group: pendingMeta ? pendingMeta.group : 'General',
+                url: url
+              });
+            }
+            pendingMeta = null;
+          }
+        }
+        return channels;
+      }
+
+      /* --------------------------------------------------------------------
+         5. HTML5 <CANVAS> FRAME-BY-FRAME IMAGE RENDERER & WATCHDOG
+         Draws decoded video frames onto <canvas> so Tesla's browser renders
+         an image stream instead of freezing a foreground <video> overlay.
+      -------------------------------------------------------------------- */
+      const decoderVideo = document.getElementById('decoderVideo');
+      const theaterCanvas = document.getElementById('theaterCanvas');
+      const canvasCtx = theaterCanvas.getContext('2d', { alpha: false, desynchronized: true });
+
+      function startCanvasRenderLoop() {
+        stopCanvasRenderLoop();
+        state.isCanvasActive = true;
+        state.framesRendered = 0;
+        state.lastFpsTimestamp = performance.now();
+
+        function drawFrame(now) {
+          if (!state.isCanvasActive) return;
+
+          if (decoderVideo.readyState >= 2 && decoderVideo.videoWidth > 0 && decoderVideo.videoHeight > 0) {
+            if (theaterCanvas.width !== decoderVideo.videoWidth || theaterCanvas.height !== decoderVideo.videoHeight) {
+              theaterCanvas.width = decoderVideo.videoWidth;
+              theaterCanvas.height = decoderVideo.videoHeight;
+            }
+            canvasCtx.drawImage(decoderVideo, 0, 0, theaterCanvas.width, theaterCanvas.height);
+
+            // Update FPS counter once per second
+            state.framesRendered++;
+            if (now - state.lastFpsTimestamp >= 1000) {
+              state.currentFps = Math.round((state.framesRendered * 1000) / (now - state.lastFpsTimestamp));
+              state.framesRendered = 0;
+              state.lastFpsTimestamp = now;
+              document.getElementById('fpsCounterBadge').textContent = 'CANVAS • ' + state.currentFps + ' FPS';
+            }
+
+            // Update seek bar if VOD
+            if (isFinite(decoderVideo.duration) && decoderVideo.duration > 0) {
+              const seekContainer = document.getElementById('seekBarContainer');
+              seekContainer.classList.remove('hidden');
+              seekContainer.classList.add('flex');
+              document.getElementById('currentTimeLabel').textContent = formatTime(decoderVideo.currentTime);
+              document.getElementById('durationLabel').textContent = formatTime(decoderVideo.duration);
+              document.getElementById('canvasSeekSlider').value = String((decoderVideo.currentTime / decoderVideo.duration) * 100);
+            } else {
+              document.getElementById('seekBarContainer').classList.add('hidden');
+              document.getElementById('seekBarContainer').classList.remove('flex');
+            }
+          }
+
+          state.rafId = requestAnimationFrame(drawFrame);
+        }
+
+        state.rafId = requestAnimationFrame(drawFrame);
+
+        // Tesla Drive-Lock Auto-Resume Watchdog (every 300ms)
+        state.watchdogTimer = setInterval(() => {
+          if (!state.isCanvasActive || state.userPaused) return;
+          if (decoderVideo.paused && !decoderVideo.ended && decoderVideo.readyState >= 2) {
+            decoderVideo.play().catch(() => {});
+          }
+        }, 300);
+      }
+
+      function stopCanvasRenderLoop() {
+        state.isCanvasActive = false;
+        if (state.rafId) {
+          cancelAnimationFrame(state.rafId);
+          state.rafId = null;
+        }
+        if (state.watchdogTimer) {
+          clearInterval(state.watchdogTimer);
+          state.watchdogTimer = null;
+        }
+      }
+
+      // Immediately resume if browser firmware fires an unsolicited pause event
+      decoderVideo.addEventListener('pause', () => {
+        if (state.isCanvasActive && !state.userPaused && !decoderVideo.ended) {
+          setTimeout(() => {
+            if (!state.userPaused) decoderVideo.play().catch(() => {});
+          }, 50);
+        }
+      });
+
+      function destroyActivePlayers() {
+        stopCanvasRenderLoop();
+        const iframe = document.getElementById('embedIframePlayer');
+        const qualityWrapper = document.getElementById('qualityWrapper');
+        const overlayControls = document.getElementById('canvasOverlayControls');
+
+        if (state.hlsInstance) {
+          try { state.hlsInstance.destroy(); } catch (e) {}
+          state.hlsInstance = null;
+        }
+        if (state.mpegtsInstance) {
+          try {
+            state.mpegtsInstance.pause();
+            state.mpegtsInstance.unload();
+            state.mpegtsInstance.detachMediaElement();
+            state.mpegtsInstance.destroy();
+          } catch (e) {}
+          state.mpegtsInstance = null;
+        }
+
+        decoderVideo.pause();
+        decoderVideo.removeAttribute('src');
+        decoderVideo.load();
+
+        theaterCanvas.classList.add('hidden');
+        overlayControls.classList.add('hidden');
+
+        iframe.src = 'about:blank';
+        iframe.classList.add('hidden');
+
+        qualityWrapper.classList.add('hidden');
+        qualityWrapper.classList.remove('flex');
+      }
+
+      function setPlayerLoading(isLoading, text) {
+        const spinner = document.getElementById('playerSpinner');
+        const spinnerText = document.getElementById('spinnerText');
+        if (isLoading) {
+          spinnerText.textContent = text || 'Rendering frames to canvas...';
+          spinner.classList.remove('hidden');
+        } else {
+          spinner.classList.add('hidden');
+        }
+      }
+
+      function updateNowPlayingUI(stream) {
+        state.currentStream = stream;
+        document.getElementById('playerPlaceholder').classList.add('hidden');
+        document.getElementById('nowPlayingBadge').textContent = stream.badge || 'CANVAS LIVE';
+        document.getElementById('nowPlayingTitle').textContent = stream.title || 'Streaming';
+        document.getElementById('nowPlayingMeta').textContent = stream.meta || stream.url;
+
+        const isFav = state.favorites.some((f) => f.url === stream.url);
+        document.getElementById('favCurrentIcon').textContent = isFav ? '★' : '☆';
+      }
+
+      function playStream(stream) {
+        if (!stream || !stream.url) return;
+        destroyActivePlayers();
+        state.userPaused = false;
+        document.getElementById('canvasPlayPauseBtn').textContent = '⏸';
+        updateNowPlayingUI(stream);
+
+        const iframe = document.getElementById('embedIframePlayer');
+        const overlayControls = document.getElementById('canvasOverlayControls');
+
+        // Cross-origin Iframe sources (YouTube / Twitch / Google Drive)
+        if (stream.type === 'youtube' || stream.type === 'twitch' || stream.type === 'gdrive') {
+          setPlayerLoading(false);
+          iframe.classList.remove('hidden');
+          iframe.src = stream.url;
+          return;
+        }
+
+        // Canvas Frame-by-Frame Image Renderer (HLS .m3u8, MPEG-TS .ts, MP4)
+        theaterCanvas.classList.remove('hidden');
+        overlayControls.classList.remove('hidden');
+        startCanvasRenderLoop();
+        setPlayerLoading(true, 'Buffering ' + (stream.title || 'stream') + ' onto Canvas...');
+
+        const url = stream.url;
+        const isTs = /\.ts(\?.*)?$/i.test(url);
+        const isMp4 = /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
+
+        decoderVideo.onplaying = () => setPlayerLoading(false);
+        decoderVideo.oncanplay = () => setPlayerLoading(false);
+        decoderVideo.onerror = () => {
+          setPlayerLoading(false);
+          showToast('Stream offline or blocked. Try another channel.');
+        };
+
+        if (isTs && window.mpegts && mpegts.getFeatureList().mseLivePlayback) {
+          const player = mpegts.createPlayer({ type: 'mpegts', isLive: true, url: url });
+          player.attachMediaElement(decoderVideo);
+          player.load();
+          player.play().catch(() => {});
+          state.mpegtsInstance = player;
+          return;
+        }
+
+        if (!isMp4 && window.Hls && Hls.isSupported()) {
+          const hls = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true,
+            backBufferLength: 30
+          });
+          hls.loadSource(url);
+          hls.attachMedia(decoderVideo);
+
+          hls.on(Hls.Events.MANIFEST_PARSED, function (_, data) {
+            setPlayerLoading(false);
+            decoderVideo.play().catch(() => {});
+            populateQualityLevels(hls, data.levels || []);
+          });
+
+          hls.on(Hls.Events.ERROR, function (_, data) {
+            if (data.fatal) {
+              if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                hls.startLoad();
+              } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                hls.recoverMediaError();
+              } else {
+                setPlayerLoading(false);
+                showToast('Stream unavailable. Try reloading or switching channels.');
+              }
+            }
+          });
+
+          state.hlsInstance = hls;
+        } else {
+          decoderVideo.src = url;
+          decoderVideo.play().catch(() => {});
+        }
+      }
+
+      function populateQualityLevels(hls, levels) {
+        const wrapper = document.getElementById('qualityWrapper');
+        const select = document.getElementById('hlsQualitySelect');
+        select.innerHTML = '<option value="-1" class="bg-[#12161e]">Auto</option>';
+
+        if (!levels || levels.length <= 1) {
+          wrapper.classList.add('hidden');
+          wrapper.classList.remove('flex');
+          return;
+        }
+
+        levels.forEach((lvl, idx) => {
+          const label = lvl.height ? lvl.height + 'p' : Math.round((lvl.bitrate || 0) / 1000) + ' kbps';
+          const opt = document.createElement('option');
+          opt.value = String(idx);
+          opt.textContent = label;
+          opt.className = 'bg-[#12161e]';
+          select.appendChild(opt);
+        });
+
+        select.onchange = function () {
+          hls.currentLevel = parseInt(select.value, 10);
+          showToast('Stream quality: ' + select.options[select.selectedIndex].text);
+        };
+
+        wrapper.classList.remove('hidden');
+        wrapper.classList.add('flex');
+      }
+
+      /* --------------------------------------------------------------------
+         6. LIVE TV (DIRECT CANVAS HLS + PLUTO TV)
+      -------------------------------------------------------------------- */
+      async function loadPlutoRegion(regionKey) {
+        state.plutoRegion = regionKey;
+        document.querySelectorAll('.pluto-region-btn').forEach((btn) => {
+          const active = btn.dataset.pluto === regionKey;
+          btn.className = active
+            ? 'pluto-region-btn min-h-[38px] px-3 rounded-lg text-xs font-extrabold bg-[#00d2ff] text-black'
+            : 'pluto-region-btn min-h-[38px] px-3 rounded-lg text-xs font-bold bg-[#171c26] text-gray-300 hover:bg-[#202736] border border-[#262e3d]';
+        });
+
+        const src = PLUTO_SOURCES[regionKey] || PLUTO_SOURCES.news;
+        if (!src.url) {
+          state.liveChannels = [...DIRECT_CANVAS_LIVE_CHANNELS];
+          state.liveCategory = 'All';
+          renderLiveTvCategories();
+          renderLiveTvList();
+          return;
+        }
+
+        const countLabel = document.getElementById('liveTvCountLabel');
+        countLabel.textContent = 'Syncing ' + src.label + ' guide...';
+
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 6000);
+
+        try {
+          const res = await fetch(src.url, { signal: controller.signal });
+          clearTimeout(timer);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const text = await res.text();
+          const parsed = parseM3U(text);
+          state.liveChannels = parsed.length ? parsed : [...DIRECT_CANVAS_LIVE_CHANNELS];
+          state.liveCategory = 'All';
+          renderLiveTvCategories();
+          renderLiveTvList();
+        } catch (err) {
+          clearTimeout(timer);
+          state.liveChannels = [...DIRECT_CANVAS_LIVE_CHANNELS];
+          state.liveCategory = 'All';
+          renderLiveTvCategories();
+          renderLiveTvList();
+        }
+      }
+
+      function renderLiveTvCategories() {
+        const bar = document.getElementById('liveTvCategoryBar');
+        const groups = ['All'];
+        state.liveChannels.forEach((ch) => {
+          if (ch.group && !groups.includes(ch.group)) groups.push(ch.group);
+        });
+
+        bar.innerHTML = '';
+        groups.slice(0, 20).forEach((grp) => {
+          const btn = document.createElement('button');
+          const active = state.liveCategory === grp;
+          btn.className = active
+            ? 'min-h-[36px] px-3 rounded-lg text-xs font-extrabold bg-white text-black whitespace-nowrap'
+            : 'min-h-[36px] px-3 rounded-lg text-xs font-bold bg-[#171c26] text-gray-300 hover:bg-[#202736] border border-[#252d3c] whitespace-nowrap';
+          btn.textContent = grp;
+          btn.onclick = () => {
+            state.liveCategory = grp;
+            renderLiveTvCategories();
+            renderLiveTvList();
+          };
+          bar.appendChild(btn);
+        });
+      }
+
+      function renderLiveTvList() {
+        const container = document.getElementById('liveTvChannelList');
+        const q = state.liveSearch.trim().toLowerCase();
+
+        const filtered = state.liveChannels.filter((ch) => {
+          if (state.liveFavOnly && !state.favorites.some((f) => f.url === ch.url)) return false;
+          if (state.liveCategory !== 'All' && ch.group !== state.liveCategory) return false;
+          if (q && !ch.name.toLowerCase().includes(q) && !(ch.group || '').toLowerCase().includes(q)) return false;
+          return true;
+        });
+
+        document.getElementById('liveTvCountLabel').textContent =
+          filtered.length + ' Canvas-ready streams (' + (PLUTO_SOURCES[state.plutoRegion]?.label || 'Live TV') + ')';
+
+        if (!filtered.length) {
+          container.innerHTML = '<div class="col-span-full text-center py-8 text-xs text-gray-400">No channels match your filter.</div>';
+          return;
+        }
+
+        container.innerHTML = '';
+        filtered.slice(0, 250).forEach((ch) => {
+          const isFav = state.favorites.some((f) => f.url === ch.url);
+          const isCurrent = state.currentStream && state.currentStream.url === ch.url;
+          const card = document.createElement('div');
+          card.className = 'min-h-[58px] p-2.5 rounded-xl border flex items-center justify-between gap-2.5 cursor-pointer transition ' +
+            (isCurrent
+              ? 'bg-[#00d2ff]/15 border-[#00d2ff]'
+              : 'bg-[#141923] hover:bg-[#1b2230] border-[#222938]');
+
+          const logoHtml = ch.logo
+            ? `<img src="${escapeHtml(ch.logo)}" alt="" loading="lazy" onerror="this.style.display='none'" class="w-9 h-9 rounded-lg object-contain bg-black/40 p-1 shrink-0" />`
+            : `<div class="w-9 h-9 rounded-lg bg-[#1e2636] flex items-center justify-center text-xs font-extrabold text-[#00d2ff] shrink-0">${escapeHtml(ch.name.slice(0, 2).toUpperCase())}</div>`;
+
+          card.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              ${logoHtml}
+              <div class="min-w-0">
+                <div class="font-bold text-xs sm:text-sm text-white truncate">${escapeHtml(ch.name)}</div>
+                <div class="text-[11px] text-gray-400 truncate">${escapeHtml(ch.group || 'Live TV')} • Canvas</div>
+              </div>
+            </div>
+            <button class="fav-toggle-btn w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center text-sm ${isFav ? 'text-amber-400' : 'text-gray-500'}" title="Toggle Favorite">
+              ${isFav ? '★' : '☆'}
+            </button>
+          `;
+
+          card.onclick = (e) => {
+            if (e.target.closest('.fav-toggle-btn')) {
+              toggleFavorite({ title: ch.name, url: ch.url, group: ch.group, type: 'hls', badge: 'CANVAS LIVE' });
+              renderLiveTvList();
+              return;
+            }
+            playStream({
+              title: ch.name,
+              url: ch.url,
+              meta: (ch.group || 'Live TV') + ' • HTML5 Canvas Frame Renderer',
+              type: 'hls',
+              badge: 'CANVAS LIVE'
+            });
+            renderLiveTvList();
+          };
+
+          container.appendChild(card);
+        });
+      }
+
+      /* --------------------------------------------------------------------
+         7. IPTV PLAYLISTS (IPTV-ORG & CUSTOM M3U)
+      -------------------------------------------------------------------- */
+      async function loadIptvFromUrl(url) {
+        const cleanUrl = (url || '').trim();
+        if (!cleanUrl) return;
+        const statusEl = document.getElementById('iptvStatusLabel');
+
+        if (/\.(m3u8|ts|mp4)(\?.*)?$/i.test(cleanUrl) && !/\.m3u(\?.*)?$/i.test(cleanUrl)) {
+          playStream({
+            title: cleanUrl.split('/').pop().split('?')[0] || 'Custom IPTV Stream',
+            url: cleanUrl,
+            meta: 'Direct IPTV Stream • Canvas Mode',
+            type: 'hls',
+            badge: 'CANVAS IPTV'
+          });
+          return;
+        }
+
+        statusEl.textContent = 'Fetching M3U playlist...';
+        try {
+          const res = await fetch(cleanUrl);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const text = await res.text();
+          const channels = parseM3U(text);
+          if (!channels.length) throw new Error('No streams found');
+          state.iptvChannels = channels;
+          statusEl.textContent = 'Loaded ' + channels.length + ' Canvas-compatible channels.';
+          renderIptvList();
+        } catch (err) {
+          statusEl.textContent = 'Could not fetch playlist (CORS or invalid M3U). Try uploading the .m3u file directly.';
+          showToast('Failed to load M3U URL');
+        }
+      }
+
+      function renderIptvList() {
+        const listEl = document.getElementById('iptvChannelList');
+        const q = state.iptvSearch.trim().toLowerCase();
+        const filtered = state.iptvChannels.filter((ch) =>
+          !q || ch.name.toLowerCase().includes(q) || (ch.group || '').toLowerCase().includes(q)
+        );
+
+        listEl.innerHTML = '';
+        filtered.slice(0, 300).forEach((ch) => {
+          const row = document.createElement('button');
+          row.className = 'w-full min-h-[50px] px-3 py-2 rounded-xl bg-[#141923] hover:bg-[#1c2332] border border-[#222938] flex items-center justify-between gap-2 text-left transition';
+          row.innerHTML = `
+            <div class="min-w-0">
+              <div class="font-bold text-xs sm:text-sm text-white truncate">${escapeHtml(ch.name)}</div>
+              <div class="text-[11px] text-gray-400 truncate">${escapeHtml(ch.group || 'IPTV')}</div>
+            </div>
+            <span class="text-xs font-extrabold text-[#00d2ff] shrink-0">▶ Canvas</span>
+          `;
+          row.onclick = () => {
+            playStream({
+              title: ch.name,
+              url: ch.url,
+              meta: (ch.group || 'IPTV') + ' • HTML5 Canvas Frame Renderer',
+              type: 'hls',
+              badge: 'CANVAS IPTV'
+            });
+          };
+          listEl.appendChild(row);
+        });
+      }
+
+      /* --------------------------------------------------------------------
+         8. CLOUD & DIRECT VIDEO (CANVAS MODE)
+      -------------------------------------------------------------------- */
+      function resolveCloudStream(rawUrl, customTitle) {
+        const val = (rawUrl || '').trim();
+        if (!val) return null;
+
+        const driveMatch = val.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i) ||
+                           val.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/i);
+        if (driveMatch) {
+          return {
+            title: customTitle || 'Google Drive Video',
+            url: 'https://drive.google.com/file/d/' + driveMatch[1] + '/preview',
+            meta: 'Google Drive Embed',
+            type: 'gdrive',
+            badge: 'G-DRIVE'
+          };
+        }
+
+        return {
+          title: customTitle || val.split('/').pop().split('?')[0] || 'Direct Video',
+          url: val,
+          meta: 'Direct Video • HTML5 Canvas Frame Renderer',
+          type: 'hls',
+          badge: 'CANVAS VIDEO'
+        };
+      }
+
+      function renderCloudList() {
+        const container = document.getElementById('cloudList');
+        container.innerHTML = '';
+        state.cloudItems.forEach((item, idx) => {
+          const row = document.createElement('div');
+          row.className = 'min-h-[54px] p-2.5 rounded-xl bg-[#141923] hover:bg-[#1c2332] border border-[#222938] flex items-center justify-between gap-2 cursor-pointer transition';
+          row.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="w-8 h-8 rounded-lg bg-[#00d2ff]/15 text-[#00d2ff] flex items-center justify-center text-xs font-extrabold shrink-0">🖼️</span>
+              <div class="min-w-0">
+                <div class="font-bold text-xs sm:text-sm text-white truncate">${escapeHtml(item.title)}</div>
+                <div class="text-[11px] text-gray-400 truncate">${escapeHtml(item.url)}</div>
+              </div>
+            </div>
+            <button class="del-cloud-btn px-2 py-1 text-xs text-gray-500 hover:text-red-400" title="Remove">✕</button>
+          `;
+          row.onclick = (e) => {
+            if (e.target.closest('.del-cloud-btn')) {
+              state.cloudItems.splice(idx, 1);
+              saveStoredData();
+              renderCloudList();
+              return;
+            }
+            const resolved = resolveCloudStream(item.url, item.title);
+            if (resolved) playStream(resolved);
+          };
+          container.appendChild(row);
+        });
+      }
+
+      /* --------------------------------------------------------------------
+         9. YOUTUBE & TWITCH
+      -------------------------------------------------------------------- */
+      function parseYouTubeInput(raw) {
+        const val = (raw || '').trim();
+        if (!val) return null;
+
+        if (/^[a-zA-Z0-9_-]{11}$/.test(val)) {
+          return {
+            embedUrl: 'https://www.youtube-nocookie.com/embed/' + val + '?autoplay=1&rel=0&modestbranding=1',
+            id: val
+          };
+        }
+
+        try {
+          const u = new URL(val.startsWith('http') ? val : 'https://' + val);
+          const listId = u.searchParams.get('list');
+          const vId = u.searchParams.get('v');
+
+          if (vId) {
+            return {
+              embedUrl: 'https://www.youtube-nocookie.com/embed/' + vId + '?autoplay=1&rel=0&modestbranding=1' + (listId ? '&list=' + listId : ''),
+              id: vId
+            };
+          }
+          if (listId) {
+            return {
+              embedUrl: 'https://www.youtube-nocookie.com/embed/videoseries?list=' + listId + '&autoplay=1',
+              id: listId
+            };
+          }
+          if (u.hostname.includes('youtu.be')) {
+            const pathId = u.pathname.replace('/', '').split('/')[0];
+            if (pathId) {
+              return {
+                embedUrl: 'https://www.youtube-nocookie.com/embed/' + pathId + '?autoplay=1&rel=0',
+                id: pathId
+              };
+            }
+          }
+          const shortsOrLive = u.pathname.match(/\/(shorts|live|embed)\/([a-zA-Z0-9_-]{11})/);
+          if (shortsOrLive) {
+            return {
+              embedUrl: 'https://www.youtube-nocookie.com/embed/' + shortsOrLive[2] + '?autoplay=1&rel=0',
+              id: shortsOrLive[2]
+            };
+          }
+        } catch (e) {}
+        return null;
+      }
+
+      function renderYouTubeList() {
+        const container = document.getElementById('youtubeList');
+        container.innerHTML = '';
+        state.youtubeItems.forEach((item, idx) => {
+          const row = document.createElement('div');
+          row.className = 'min-h-[54px] p-2.5 rounded-xl bg-[#141923] hover:bg-[#1c2332] border border-[#222938] flex items-center justify-between gap-2 cursor-pointer transition';
+          row.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="w-8 h-8 rounded-lg bg-[#e82127]/20 text-[#e82127] flex items-center justify-center text-xs font-extrabold shrink-0">▶</span>
+              <div class="min-w-0">
+                <div class="font-bold text-xs sm:text-sm text-white truncate">${escapeHtml(item.title)}</div>
+                <div class="text-[11px] text-gray-400 truncate">ID: ${escapeHtml(item.videoId)}</div>
+              </div>
+            </div>
+            <button class="del-yt-btn px-2 py-1 text-xs text-gray-500 hover:text-red-400" title="Remove">✕</button>
+          `;
+          row.onclick = (e) => {
+            if (e.target.closest('.del-yt-btn')) {
+              state.youtubeItems.splice(idx, 1);
+              saveStoredData();
+              renderYouTubeList();
+              return;
+            }
+            const parsed = parseYouTubeInput(item.videoId);
+            if (parsed) {
+              playStream({
+                title: item.title,
+                url: parsed.embedUrl,
+                meta: 'YouTube Embed (Use Live TV tab for Canvas mode)',
+                type: 'youtube',
+                badge: 'YOUTUBE'
+              });
+            }
+          };
+          container.appendChild(row);
+        });
+      }
+
+      function normalizeTwitchChannel(raw) {
+        const val = (raw || '').trim();
+        if (!val) return '';
+        const match = val.match(/twitch\.tv\/([a-zA-Z0-9_]+)/i);
+        if (match) return match[1];
+        return val.replace(/[^a-zA-Z0-9_]/g, '');
+      }
+
+      function buildTwitchEmbedUrl(channel) {
+        const host = window.location.hostname || 'localhost';
+        return 'https://player.twitch.tv/?channel=' + encodeURIComponent(channel) + '&parent=' + encodeURIComponent(host) + '&autoplay=true';
+      }
+
+      function renderTwitchList() {
+        const container = document.getElementById('twitchList');
+        container.innerHTML = '';
+        state.twitchItems.forEach((item, idx) => {
+          const row = document.createElement('div');
+          row.className = 'min-h-[54px] p-2.5 rounded-xl bg-[#141923] hover:bg-[#1c2332] border border-[#222938] flex items-center justify-between gap-2 cursor-pointer transition';
+          row.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="w-8 h-8 rounded-lg bg-[#9146ff]/20 text-[#a970ff] flex items-center justify-center text-xs font-extrabold shrink-0">TV</span>
+              <div class="min-w-0">
+                <div class="font-bold text-xs sm:text-sm text-white truncate">${escapeHtml(item.label || item.channel)}</div>
+                <div class="text-[11px] text-gray-400 truncate">twitch.tv/${escapeHtml(item.channel)}</div>
+              </div>
+            </div>
+            <button class="del-tw-btn px-2 py-1 text-xs text-gray-500 hover:text-red-400" title="Remove">✕</button>
+          `;
+          row.onclick = (e) => {
+            if (e.target.closest('.del-tw-btn')) {
+              state.twitchItems.splice(idx, 1);
+              saveStoredData();
+              renderTwitchList();
+              return;
+            }
+            playStream({
+              title: item.label || item.channel,
+              url: buildTwitchEmbedUrl(item.channel),
+              meta: 'Twitch Live • twitch.tv/' + item.channel,
+              type: 'twitch',
+              badge: 'TWITCH'
+            });
+          };
+          container.appendChild(row);
+        });
+      }
+
+      /* --------------------------------------------------------------------
+         10. FAVORITES, TAB NAVIGATION & CANVAS CONTROLS
+      -------------------------------------------------------------------- */
+      function toggleFavorite(item) {
+        const idx = state.favorites.findIndex((f) => f.url === item.url);
+        if (idx >= 0) {
+          state.favorites.splice(idx, 1);
+          showToast('Removed from Favorites');
+        } else {
+          state.favorites.push(item);
+          showToast('Added to Favorites ★');
+        }
+        saveStoredData();
+        if (state.currentStream && state.currentStream.url === item.url) {
+          document.getElementById('favCurrentIcon').textContent = idx >= 0 ? '☆' : '★';
+        }
+      }
+
+      function switchTab(tabName) {
+        state.activeTab = tabName;
+        document.querySelectorAll('.source-tab').forEach((btn) => {
+          const active = btn.dataset.tab === tabName;
+          btn.className = active
+            ? 'source-tab min-h-[46px] px-4 rounded-xl font-bold text-sm flex items-center gap-2 transition whitespace-nowrap bg-[#00d2ff] text-black'
+            : 'source-tab min-h-[46px] px-4 rounded-xl font-bold text-sm flex items-center gap-2 transition whitespace-nowrap bg-[#151921] text-gray-300 hover:bg-[#1e2430] border border-[#242a36]';
+        });
+
+        document.querySelectorAll('.source-panel').forEach((panel) => {
+          panel.classList.add('hidden');
+          panel.classList.remove('flex');
+        });
+        const target = document.getElementById('panel-' + tabName);
+        if (target) {
+          target.classList.remove('hidden');
+          target.classList.add('flex');
+        }
+      }
+
+      function startClock() {
+        const el = document.getElementById('clockDisplay');
+        function tick() {
+          const now = new Date();
+          el.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) +
+            ' • ' + now.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+        tick();
+        setInterval(tick, 15000);
+      }
+
+      function bindEvents() {
+        // Canvas interactive play/pause & volume
+        function toggleCanvasPlayPause() {
+          if (!state.isCanvasActive) return;
+          if (state.userPaused || decoderVideo.paused) {
+            state.userPaused = false;
+            decoderVideo.play().catch(() => {});
+            document.getElementById('canvasPlayPauseBtn').textContent = '⏸';
+          } else {
+            state.userPaused = true;
+            decoderVideo.pause();
+            document.getElementById('canvasPlayPauseBtn').textContent = '▶';
+          }
+        }
+
+        theaterCanvas.onclick = toggleCanvasPlayPause;
+        document.getElementById('canvasPlayPauseBtn').onclick = toggleCanvasPlayPause;
+
+        document.getElementById('canvasMuteBtn').onclick = () => {
+          decoderVideo.muted = !decoderVideo.muted;
+          document.getElementById('canvasMuteBtn').textContent = decoderVideo.muted ? '🔇' : '🔊';
+        };
+
+        document.getElementById('canvasVolumeSlider').oninput = (e) => {
+          decoderVideo.volume = parseFloat(e.target.value);
+          decoderVideo.muted = decoderVideo.volume === 0;
+          document.getElementById('canvasMuteBtn').textContent = decoderVideo.muted ? '🔇' : '🔊';
+        };
+
+        document.getElementById('canvasSeekSlider').oninput = (e) => {
+          if (isFinite(decoderVideo.duration) && decoderVideo.duration > 0) {
+            decoderVideo.currentTime = (parseFloat(e.target.value) / 100) * decoderVideo.duration;
+          }
+        };
+
+        // Source Tabs
+        document.querySelectorAll('.source-tab').forEach((btn) => {
+          btn.onclick = () => switchTab(btn.dataset.tab);
+        });
+
+        // Tesla Fullscreen Redirect
+        document.getElementById('teslaFullscreenBtn').onclick = () => {
+          const clean = new URL(window.location.href);
+          clean.searchParams.delete('rd');
+          clean.hash = '';
+          window.location.href = 'https://www.youtube.com/redirect?q=' + encodeURIComponent(clean.toString());
+        };
+
+        // Player Bar Controls
+        document.getElementById('favCurrentBtn').onclick = () => {
+          if (!state.currentStream) return;
+          toggleFavorite(state.currentStream);
+          renderLiveTvList();
+        };
+
+        document.getElementById('reloadStreamBtn').onclick = () => {
+          if (state.currentStream) {
+            showToast('Reloading stream...');
+            playStream(state.currentStream);
+          }
+        };
+
+        document.getElementById('cinemaExpandBtn').onclick = () => {
+          state.cinemaExpanded = !state.cinemaExpanded;
+          document.body.classList.toggle('cinema-mode', state.cinemaExpanded);
+          document.getElementById('cinemaExpandBtn').textContent = state.cinemaExpanded ? '✕ Exit Cinema' : '⛶ Cinema';
+        };
+
+        // Live TV Events
+        document.querySelectorAll('.pluto-region-btn').forEach((btn) => {
+          btn.onclick = () => loadPlutoRegion(btn.dataset.pluto);
+        });
+
+        document.getElementById('liveTvSearchInput').oninput = (e) => {
+          state.liveSearch = e.target.value;
+          renderLiveTvList();
+        };
+
+        document.getElementById('liveTvFavOnlyBtn').onclick = (e) => {
+          state.liveFavOnly = !state.liveFavOnly;
+          e.currentTarget.className = state.liveFavOnly
+            ? 'min-h-[46px] px-3.5 rounded-xl bg-amber-400 text-black text-xs font-extrabold transition whitespace-nowrap'
+            : 'min-h-[46px] px-3.5 rounded-xl bg-[#171c26] border border-[#262e3d] text-xs font-bold text-gray-300 hover:text-white transition whitespace-nowrap';
+          renderLiveTvList();
+        };
+
+        // IPTV Events
+        document.querySelectorAll('.iptv-pack-btn').forEach((btn) => {
+          btn.onclick = () => loadIptvFromUrl(btn.dataset.iptvPack);
+        });
+
+        document.getElementById('loadCustomM3uBtn').onclick = () => {
+          loadIptvFromUrl(document.getElementById('customM3uUrlInput').value);
+        };
+
+        document.getElementById('m3uFileInput').onchange = (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            const channels = parseM3U(String(reader.result || ''));
+            state.iptvChannels = channels;
+            document.getElementById('iptvStatusLabel').textContent = 'Loaded ' + channels.length + ' channels from ' + file.name;
+            renderIptvList();
+          };
+          reader.readAsText(file);
+        };
+
+        document.getElementById('toggleRawM3uBtn').onclick = () => {
+          const box = document.getElementById('rawM3uBox');
+          box.classList.toggle('hidden');
+          box.classList.toggle('flex');
+        };
+
+        document.getElementById('parseRawM3uBtn').onclick = () => {
+          const raw = document.getElementById('rawM3uTextarea').value;
+          const channels = parseM3U(raw);
+          state.iptvChannels = channels;
+          document.getElementById('iptvStatusLabel').textContent = 'Parsed ' + channels.length + ' channels from pasted M3U.';
+          renderIptvList();
+        };
+
+        document.getElementById('iptvSearchInput').oninput = (e) => {
+          state.iptvSearch = e.target.value;
+          renderIptvList();
+        };
+
+        // Cloud Events
+        document.getElementById('playCloudBtn').onclick = () => {
+          const title = document.getElementById('cloudTitleInput').value.trim();
+          const url = document.getElementById('cloudUrlInput').value.trim();
+          const resolved = resolveCloudStream(url, title);
+          if (!resolved) {
+            showToast('Paste a direct .mp4 / .m3u8 or Google Drive URL');
+            return;
+          }
+          playStream(resolved);
+        };
+
+        document.getElementById('saveCloudItemBtn').onclick = () => {
+          const url = document.getElementById('cloudUrlInput').value.trim();
+          if (!url) {
+            showToast('Paste a video URL first');
+            return;
+          }
+          const title = document.getElementById('cloudTitleInput').value.trim() || url.split('/').pop().split('?')[0] || 'Saved Cloud Video';
+          state.cloudItems.unshift({ title, url });
+          saveStoredData();
+          renderCloudList();
+          showToast('Saved to Direct Video list');
+        };
+
+        // YouTube Events
+        document.getElementById('playYoutubeBtn').onclick = () => {
+          const raw = document.getElementById('youtubeUrlInput').value;
+          const parsed = parseYouTubeInput(raw);
+          if (!parsed) {
+            showToast('Enter a valid YouTube video, live, or playlist URL');
+            return;
+          }
+          playStream({
+            title: 'YouTube (' + parsed.id + ')',
+            url: parsed.embedUrl,
+            meta: 'YouTube Embed (Use Live TV tab for Canvas mode)',
+            type: 'youtube',
+            badge: 'YOUTUBE'
+          });
+        };
+
+        document.getElementById('saveYoutubeFavBtn').onclick = () => {
+          const raw = document.getElementById('youtubeUrlInput').value;
+          const parsed = parseYouTubeInput(raw);
+          if (!parsed) {
+            showToast('Paste a YouTube link or ID first');
+            return;
+          }
+          state.youtubeItems.unshift({ id: 'yt-' + Date.now(), title: 'Saved Video (' + parsed.id + ')', videoId: parsed.id });
+          saveStoredData();
+          renderYouTubeList();
+          showToast('Saved to YouTube list');
+        };
+
+        // Twitch Events
+        document.getElementById('playTwitchBtn').onclick = () => {
+          const ch = normalizeTwitchChannel(document.getElementById('twitchChannelInput').value);
+          if (!ch) {
+            showToast('Enter a Twitch channel name');
+            return;
+          }
+          playStream({
+            title: ch,
+            url: buildTwitchEmbedUrl(ch),
+            meta: 'Twitch Live • twitch.tv/' + ch,
+            type: 'twitch',
+            badge: 'TWITCH'
+          });
+        };
+
+        document.getElementById('saveTwitchFavBtn').onclick = () => {
+          const ch = normalizeTwitchChannel(document.getElementById('twitchChannelInput').value);
+          if (!ch) {
+            showToast('Enter a Twitch channel name first');
+            return;
+          }
+          state.twitchItems.unshift({ channel: ch, label: ch });
+          saveStoredData();
+          renderTwitchList();
+          showToast('Saved ' + ch + ' to Twitch list');
+        };
+      }
+
+      // Boot
+      loadStoredData();
+      startClock();
+      bindEvents();
+      renderYouTubeList();
+      renderTwitchList();
+      renderCloudList();
+      loadPlutoRegion('news');
+    })();
+  </script>
+</body>
+</html>
